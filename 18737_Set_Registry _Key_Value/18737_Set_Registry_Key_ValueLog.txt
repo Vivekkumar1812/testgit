@@ -1,0 +1,129 @@
+2025-11-13 11:54:00 - This script must be run as Administrator. Please run PowerShell as Administrator and try again.
+2025-11-13 11:58:05 - This script must be run as Administrator. Please run PowerShell as Administrator and try again.
+2025-11-13 12:07:44 - Script execution started
+2025-11-13 12:07:44 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:07:44 - Value Name/ Value Type/ New Value: EnableFeature / DWord / 1
+2025-11-13 12:07:44 - ERROR: Registry path not found: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:07:44 - Script execution failed
+2025-11-13 12:16:45 - Script execution started
+2025-11-13 12:16:45 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:16:45 - Value Name/ Value Type/ New Value: EnableFeature / DWord / 1
+2025-11-13 12:16:45 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:16:45 - Value 'EnableFeature' does not exist. It will be created.
+2025-11-13 12:16:45 - Created new registry value 'EnableFeature' with value '1' (Type: DWord)
+2025-11-13 12:16:45 - SUCCESS: Registry key 'EnableFeature' set to '1' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-13 12:16:45 - Script execution completed successfully
+2025-11-13 12:27:14 - Script execution started
+2025-11-13 12:27:14 - Registry Path: HKLU:\SOFTWARE\TestApp
+2025-11-13 12:27:14 - Value Name/ Value Type/ New Value: EnableFeature / DWord / 1
+2025-11-13 12:27:14 - ERROR: Registry path not found: HKLU:\SOFTWARE\TestApp
+2025-11-13 12:27:14 - Script execution failed
+ 2025-11-13 12:28:20 - Script execution started
+2025-11-13 12:28:20 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:28:20 - Value Name/ Value Type/ New Value: EnableFeature / DWord / 1
+2025-11-13 12:28:20 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-13 12:28:20 - Current value of 'EnableFeature': 1 (Type: DWord)
+2025-11-13 12:28:20 - Registry value 'EnableFeature' already has the desired value: 1
+2025-11-13 12:28:20 - No changes required.
+2025-11-13 12:28:20 - SUCCESS: Registry key 'EnableFeature' set to '1' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-13 12:28:20 - Script execution completed successfully
+
+2025-11-14 11:30:16 - Script execution started
+2025-11-14 11:30:16 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:30:16 - Value Name/ Value Type/ New Value: EnableFeature / DWord / 1
+2025-11-14 11:30:16 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:30:16 - Current value of 'EnableFeature': 0 (Type: DWord)
+2025-11-14 11:30:16 - Backup: EnableFeature was 0 at HKLM:\SOFTWARE\TestApp
+2025-11-14 11:30:16 - Updated registry value 'EnableFeature' from '0' to '1' (Type: DWord)
+2025-11-14 11:30:16 - SUCCESS: Registry key 'EnableFeature' set to '1' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 11:30:16 - Script execution completed successfully
+2025-11-14 11:30:39 - ERROR: NewValue must be numeric for DWord
+2025-11-14 11:31:50 - ERROR: Invalid ValueType 'text'. Valid types: DWord, QWord, String, ExpandString, MultiString, Binary
+2025-11-14 11:32:49 - Script execution started
+2025-11-14 11:32:49 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:32:49 - Value Name/ Value Type/ New Value: BinaryData / Binary / 1
+2025-11-14 11:32:49 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:32:49 - Value 'BinaryData' does not exist. It will be created.
+2025-11-14 11:32:49 - Created new registry value 'BinaryData' with value '1' (Type: Binary)
+2025-11-14 11:32:49 - SUCCESS: Registry key 'BinaryData' set to '1' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 11:32:49 - Script execution completed successfully
+2025-11-14 11:33:36 - Script execution started
+2025-11-14 11:33:36 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:33:36 - Value Name/ Value Type/ New Value: BinaryData / Binary / FF
+2025-11-14 11:33:36 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:33:36 - Current value of 'BinaryData': 1 (Type: Binary)
+2025-11-14 11:33:36 - Backup: BinaryData was 1 at HKLM:\SOFTWARE\TestApp
+2025-11-14 11:33:36 - Updated registry value 'BinaryData' from '1' to 'FF' (Type: Binary)
+2025-11-14 11:33:36 - SUCCESS: Registry key 'BinaryData' set to 'FF' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 11:33:36 - Script execution completed successfully
+2025-11-14 11:33:46 - Script execution started
+2025-11-14 11:33:46 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:33:46 - Value Name/ Value Type/ New Value: BinaryData / Binary / FF
+2025-11-14 11:33:46 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:33:46 - Current value of 'BinaryData': FF (Type: String)
+2025-11-14 11:33:46 - Registry value 'BinaryData' already has the desired value: FF
+2025-11-14 11:33:46 - No changes required.
+2025-11-14 11:33:46 - SUCCESS: Registry key 'BinaryData' set to 'FF' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 11:33:46 - Script execution completed successfully
+2025-11-14 11:58:32 - Script execution started
+2025-11-14 11:58:32 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:58:32 - Value Name/ Value Type/ New Value: BinaryData / Binary / 255
+2025-11-14 11:58:32 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 11:58:32 - Current value of 'BinaryData': FF (Type: String)
+2025-11-14 11:58:32 - Backup: BinaryData was FF at HKLM:\SOFTWARE\TestApp
+2025-11-14 11:58:32 - Updated registry value 'BinaryData' from 'FF' to '255' (Type: String)
+2025-11-14 11:58:32 - SUCCESS: Registry key 'BinaryData' set to '255' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 11:58:32 - Script execution completed successfully
+2025-11-14 12:03:08 - Script execution started
+2025-11-14 12:03:08 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:03:08 - Value Name/ Value Type/ New Value: ServerList / MultiString / Server1 Server2 Server3
+2025-11-14 12:03:08 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:03:08 - Value 'ServerList' does not exist. It will be created.
+2025-11-14 12:03:08 - Created new registry value 'ServerList' with value 'Server1 Server2 Server3' (Type: MultiString)
+2025-11-14 12:03:08 - SUCCESS: Registry key 'ServerList' set to 'Server1 Server2 Server3' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 12:03:08 - Script execution completed successfully
+2025-11-14 12:04:54 - Script execution started
+2025-11-14 12:04:54 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:04:54 - Value Name/ Value Type/ New Value: MaxLimit / Qword / 123452356
+2025-11-14 12:04:54 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:04:54 - Value 'MaxLimit' does not exist. It will be created.
+2025-11-14 12:04:54 - Created new registry value 'MaxLimit' with value '123452356' (Type: Qword)
+2025-11-14 12:04:54 - SUCCESS: Registry key 'MaxLimit' set to '123452356' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 12:04:54 - Script execution completed successfully
+2025-11-14 12:12:39 - Script execution started
+2025-11-14 12:12:40 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:12:40 - Value Name/ Value Type/ New Value: BinaryData / Binary / 1 1 1
+2025-11-14 12:12:40 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:12:40 - Current value of 'BinaryData': 255 (Type: String)
+2025-11-14 12:12:40 - Backup: BinaryData was 255 at HKLM:\SOFTWARE\TestApp
+2025-11-14 12:12:40 - Updated registry value 'BinaryData' from '255' to '1 1 1' (Type: String)
+2025-11-14 12:12:40 - SUCCESS: Registry key 'BinaryData' set to '1 1 1' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 12:12:40 - Script execution completed successfully
+2025-11-14 12:35:05 - Script execution started
+2025-11-14 12:35:05 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:35:05 - Value Name/ Value Type/ New Value: BinaryData / Binary / 21
+2025-11-14 12:35:05 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:35:05 - Current value of 'BinaryData': 1 1 1 (Type: String)
+2025-11-14 12:35:05 - Backup: BinaryData was 1 1 1 at HKLM:\SOFTWARE\TestApp
+2025-11-14 12:35:05 - Updated registry value 'BinaryData' from '1 1 1' to '21' (Type: String)
+2025-11-14 12:35:05 - SUCCESS: Registry key 'BinaryData' set to '21' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 12:35:05 - Script execution completed successfully
+2025-11-14 12:38:04 - Script execution started
+2025-11-14 12:38:04 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:38:04 - Value Name/ Value Type/ New Value: BinaryData / Binary / 21
+2025-11-14 12:38:04 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 12:38:05 - Current value of 'BinaryData': 21 (Type: String)
+2025-11-14 12:38:05 - Registry value 'BinaryData' already has the desired value: 21
+2025-11-14 12:38:05 - No changes required.
+2025-11-14 12:38:05 - SUCCESS: Registry key 'BinaryData' set to '21' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 12:38:05 - Script execution completed successfully
+2025-11-14 13:10:25 - Script execution started
+2025-11-14 13:10:25 - Registry Path: HKLM:\SOFTWARE\TestApp
+2025-11-14 13:10:25 - Value Name: BinaryData / Value Type: Binary
+2025-11-14 13:10:25 - Binary Value - Decimal: [42] | Hex (as shown in Registry Editor): [2A]
+2025-11-14 13:10:25 - Registry path exists: HKLM:\SOFTWARE\TestApp
+2025-11-14 13:10:25 - Current value of 'BinaryData': 21 (Type: String)
+2025-11-14 13:10:25 - Backup: BinaryData was 21 at HKLM:\SOFTWARE\TestApp
+2025-11-14 13:10:25 - Updated registry value 'BinaryData' from '21' to '42' (Type: String)
+2025-11-14 13:10:25 - SUCCESS: Registry key 'BinaryData' set to '42' at 'HKLM:\SOFTWARE\TestApp'
+2025-11-14 13:10:25 - Script execution completed successfully

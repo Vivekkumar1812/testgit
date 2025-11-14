@@ -1,13 +1,13 @@
 <#
-SCRIPT NAME             18737_Set_Registry _Key_Value.ps1
+SCRIPT NAME             18737_Set_Registry_Key_Value.ps1
 IN REPOSITORY           No
 AUTHOR & EMAIL          Vivek: vivek.f.vivek@capgemini.com
 COMPANY                 Capgemini
 TAGS                    Remediation
 STATUS                  draft
-DATE OF CHANGES         Nov 13th, 2025  
+DATE OF CHANGES         Nov 14th, 2025  
 VERSION                 1.0
-RELEASENOTES            
+RELEASENOTES            NA
 APPROVED                No
 SUPPORT                 NA
 DEX TOOLS               NA
@@ -42,7 +42,7 @@ VARIABLE DESCRIPTION    $MyInvocation = It contains information about how script
                         $CurrentValue = Stores the current value of the registry key before modification.
 EXAMPLE                 .\18737_Set_Registry _Key_Value.bat "HKLM:\SOFTWARE\YourPath" "YourValueName" "DWord" "1"
                         Or
-                        .\batch file "registry path" "YourValueName" "ValueType" "value"
+                        .\18737_Set_Registry_Key_Value.ps1 "registry path" "YourValueName" "ValueType" "value"
 LOGIC DOCUMENT          NA          
 #>
 
@@ -90,16 +90,69 @@ if ($ValueType -notin $validTypes) {
 
 # Validate NewValue based on ValueType
 switch ($ValueType) {
-    "DWord" { if ($NewValue -notmatch '^\d+$') { LogMessage "ERROR: NewValue must be numeric for DWord"; exit 1 } $NewValue = [int]$NewValue }
-    "QWord" { if ($NewValue -notmatch '^\d+$') { LogMessage "ERROR: NewValue must be numeric for QWord"; exit 1 } $NewValue = [long]$NewValue }
-    "MultiString" { $NewValue = $NewValue -split ',' } # Convert comma-separated to array
-    "Binary" { $NewValue = [byte[]]($NewValue -split ',') } # Convert comma-separated bytes
+    "DWord" { 
+        if ($NewValue -notmatch '^\d+$') { 
+            LogMessage "ERROR: NewValue must be numeric for DWord"; exit 1 
+        } 
+        $NewValue = [int]$NewValue 
+    }
+    "QWord" { 
+        if ($NewValue -notmatch '^\d+$') { 
+            LogMessage "ERROR: NewValue must be numeric for QWord"; exit 1 
+        } 
+        $NewValue = [long]$NewValue 
+    }
+    "MultiString" { 
+        $NewValue = $NewValue -split ',' 
+    }
+    "Binary" { 
+        try {
+            # Only accept binary values (containing only 0 and 1)
+            if ($NewValue -match '^[01]+$') {
+                # Valid binary string (e.g., "10101")
+                # Convert binary to decimal first
+                $decimalValue = [Convert]::ToInt64($NewValue, 2)
+                
+                # Convert decimal to byte array
+                if ($decimalValue -le 255) {
+                    # Single byte
+                    $NewValue = [byte[]]@([byte]$decimalValue)
+                } else {
+                    # Multiple bytes - convert to hex then split into bytes
+                    $hexString = $decimalValue.ToString("X")
+                    if ($hexString.Length % 2 -ne 0) { $hexString = "0" + $hexString }
+                    $hexPairs = @()
+                    for ($i = 0; $i -lt $hexString.Length; $i += 2) {
+                        $hexPairs += $hexString.Substring($i, 2)
+                    }
+                    $NewValue = $hexPairs | ForEach-Object { [Convert]::ToByte($_, 16) }
+                }
+            }
+            else {
+                throw "Invalid binary format. Binary values must contain only 0 and 1 digits (e.g., '10101', '11110000')"
+            }
+        }
+        catch {
+            LogMessage "ERROR: Invalid Binary value '$NewValue'. $_"
+            LogMessage "Binary values must contain only 0 and 1 digits (e.g., '10101', '11110000')"
+            exit 1
+        }
+    }
 }
 
 # Start logging
 LogMessage "Script execution started"
 LogMessage "Registry Path: $RegistryPath"
-LogMessage "Value Name/ Value Type/ New Value: $ValueName / $ValueType / $NewValue"
+
+# Display binary values with both decimal and hex for clarity
+if ($ValueType -eq "Binary") {
+    $hexDisplay = ($NewValue | ForEach-Object { $_.ToString("X2") }) -join " "
+    $decDisplay = ($NewValue | ForEach-Object { $_.ToString() }) -join " "
+    LogMessage "Value Name: $ValueName / Value Type: $ValueType"
+    LogMessage "Binary Value - Decimal: [$decDisplay] | Hex (as shown in Registry Editor): [$hexDisplay]"
+} else {
+    LogMessage "Value Name/ Value Type/ New Value: $ValueName / $ValueType / $NewValue"
+}
 
 try {
     # Check if registry path exists
@@ -135,17 +188,33 @@ try {
     # Set new value
     if ($null -eq $CurrentValue) {
         New-ItemProperty -Path $RegistryPath -Name $ValueName -Value $NewValue -PropertyType $ValueType -Force | Out-Null
-        LogMessage "Created new registry value '$ValueName' with value '$NewValue' (Type: $ValueType)"
+        if ($ValueType -eq "Binary") {
+            $hexDisplay = ($NewValue | ForEach-Object { $_.ToString("X2") }) -join " "
+            LogMessage "Created new registry value '$ValueName' - Decimal: [$($NewValue -join ' ')] | Hex: [$hexDisplay] (Type: $ValueType)"
+        } else {
+            LogMessage "Created new registry value '$ValueName' with value '$NewValue' (Type: $ValueType)"
+        }
     } elseif ($CurrentValue -ne $NewValue) {
         LogMessage "Backup: $ValueName was $CurrentValue at $RegistryPath"
         Set-ItemProperty -Path $RegistryPath -Name $ValueName -Value $NewValue -Force
-        LogMessage "Updated registry value '$ValueName' from '$CurrentValue' to '$NewValue' (Type: $ValueType)"
+        if ($ValueType -eq "Binary") {
+            $hexDisplay = ($NewValue | ForEach-Object { $_.ToString("X2") }) -join " "
+            LogMessage "Updated registry value '$ValueName' - Decimal: [$($NewValue -join ' ')] | Hex: [$hexDisplay] (Type: $ValueType)"
+        } else {
+            LogMessage "Updated registry value '$ValueName' from '$CurrentValue' to '$NewValue' (Type: $ValueType)"
+        }
     } else {
         LogMessage "Registry value '$ValueName' already has the desired value: $CurrentValue"
         LogMessage "No changes required."
     }
 
-    LogMessage "SUCCESS: Registry key '$ValueName' set to '$NewValue' at '$RegistryPath'"
+    if ($ValueType -eq "Binary") {
+        $hexDisplay = ($NewValue | ForEach-Object { $_.ToString("X2") }) -join " "
+        LogMessage "SUCCESS: Registry key '$ValueName' set - Decimal: [$($NewValue -join ' ')] | Hex (Registry Editor shows): [$hexDisplay] at '$RegistryPath'"
+        LogMessage "NOTE: Registry Editor will display the hex values: $hexDisplay"
+    } else {
+        LogMessage "SUCCESS: Registry key '$ValueName' set to '$NewValue' at '$RegistryPath'"
+    }
     LogMessage "Script execution completed successfully"
 
 } catch {
