@@ -43,11 +43,13 @@ VARIABLE DESCRIPTION    $MyInvocation = Contains information about how the scrip
                         $fireEyeProducts = CIM objects representing detected FireEye installations
                         $successCount = Number of successfully removed products
                         $failCount = Number of failed removal attempts
-EXAMPLE                 .\19148_Remove_FireEye_Agent.ps1
+EXAMPLE                 .\19148_Remove_FireEye_Agent.ps1 (or run batch file instead of .ps1)
                         Or with product code:
                         .\19148_Remove_FireEye_Agent.ps1 -ProductCode "{12345678-1234-1234-1234-123456789012}"
                         Or with custom timeout:
                         .\19148_Remove_FireEye_Agent.ps1 -TimeoutSeconds 600
+                        or
+                        .\19148_Remove_FireEye_Agent.ps1 -ProductCode "{11111111-2222-3333-4444-555555555555}"
 LOGIC DOCUMENT          NA          
 #>
 

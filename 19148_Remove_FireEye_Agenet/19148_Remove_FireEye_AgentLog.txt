@@ -1,0 +1,35 @@
+2025-11-21 14:42:26 - [INFO] - === FireEye Agent Removal Script Started ===
+2025-11-21 14:42:26 - [INFO] - Script Version: 1.1
+2025-11-21 14:42:26 - [INFO] - Timeout configured: 300 seconds
+2025-11-21 14:42:26 - [INFO] - ========== STEP 1: PRE-REMOVAL VALIDATION ==========
+2025-11-21 14:42:26 - [INFO] - Performing pre-removal validation...
+2025-11-21 14:42:55 - [INFO] - Pre-validation: No FireEye products detected
+2025-11-21 14:42:55 - [INFO] - No FireEye Agent found on this machine. Nothing to remove.
+2025-11-21 14:42:55 - [INFO] - ========== STEP 2: VERIFICATION ==========
+2025-11-21 14:42:55 - [INFO] - Performing post-removal verification...
+2025-11-21 14:43:23 - [SUCCESS] - Verification CHECK 1: No FireEye products in installed programs
+2025-11-21 14:43:23 - [SUCCESS] - Verification CHECK 2: No FireEye services found
+2025-11-21 14:43:23 - [SUCCESS] - Verification CHECK 3: No FireEye directories found
+2025-11-21 14:43:23 - [SUCCESS] - === POST-REMOVAL VERIFICATION PASSED ===
+2025-11-21 14:43:23 - [INFO] - === EXECUTION SUMMARY ===
+2025-11-21 14:43:23 - [INFO] - Uninstall required: No
+2025-11-21 14:43:23 - [INFO] - Verification passed: True
+2025-11-21 14:43:23 - [SUCCESS] - === FireEye Agent Not Present - Script Completed ===
+2025-11-21 14:57:42 - [INFO] - === FireEye Agent Removal Script Started ===
+2025-11-21 14:57:42 - [INFO] - Script Version: 1.1
+2025-11-21 14:57:42 - [INFO] - Timeout configured: 300 seconds
+2025-11-21 14:57:42 - [INFO] - User-provided Product Code: {11111111-2222-3333-4444-555555555555}
+2025-11-21 14:57:42 - [INFO] - ========== STEP 1: PRE-REMOVAL VALIDATION ==========
+2025-11-21 14:57:42 - [INFO] - Performing pre-removal validation...
+2025-11-21 14:58:11 - [INFO] - Pre-validation: No FireEye products detected
+2025-11-21 14:58:11 - [INFO] - No FireEye Agent found on this machine. Nothing to remove.
+2025-11-21 14:58:11 - [INFO] - ========== STEP 2: VERIFICATION ==========
+2025-11-21 14:58:11 - [INFO] - Performing post-removal verification...
+2025-11-21 14:58:38 - [SUCCESS] - Verification CHECK 1: No FireEye products in installed programs
+2025-11-21 14:58:38 - [SUCCESS] - Verification CHECK 2: No FireEye services found
+2025-11-21 14:58:38 - [SUCCESS] - Verification CHECK 3: No FireEye directories found
+2025-11-21 14:58:38 - [SUCCESS] - === POST-REMOVAL VERIFICATION PASSED ===
+2025-11-21 14:58:38 - [INFO] - === EXECUTION SUMMARY ===
+2025-11-21 14:58:38 - [INFO] - Uninstall required: No
+2025-11-21 14:58:38 - [INFO] - Verification passed: True
+2025-11-21 14:58:38 - [SUCCESS] - === FireEye Agent Not Present - Script Completed ===
