@@ -71,9 +71,3 @@ Author: Vivek — vivek.f.vivek@capgemini.com
 Company: Capgemini
 
 ---
-
-If you want, I can:
-- Add `-DiscoveryTimeoutSeconds` and `-UninstallTimeoutSeconds` and update the launcher and README; or
-- Replace the CIM discovery with registry-based detection for safety and speed; or
-- Add a `-WhatIf`/`-DryRun` mode to show planned actions without performing them.
-Tell me which and I’ll implement it and run a syntax check.
