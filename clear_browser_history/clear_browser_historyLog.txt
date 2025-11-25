@@ -1,0 +1,83 @@
+
+2025-11-25 14:52:16 - [INFO] - Administrator privileges confirmed.
+2025-11-25 14:52:16 - [INFO] - Starting browser history cleanup process...
+2025-11-25 14:52:16 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 14:52:16 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 14:52:16 - [INFO] - Attempting to clear Edge history...
+2025-11-25 14:52:16 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 14:52:16 - [INFO] - Edge is currently running with 8 process(es). Will attempt to clear unlocked history files only.
+2025-11-25 14:52:16 - [INFO] - Use -ForceCloseBrowsers parameter to close Edge and delete Ctrl+H history completely.
+2025-11-25 14:52:16 - [WARNING] - Skipped locked file (browser running): C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-25 14:52:16 - [WARNING] - Skipped locked file (browser running): C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-25 14:52:16 - [INFO] - Edge: Skipped 2 locked file(s) (browser is running)
+2025-11-25 14:52:16 - [SUCCESS] - Edge history processing completed
+2025-11-25 14:52:16 - [INFO] - ===== Execution Summary =====
+2025-11-25 14:52:16 - [INFO] - Total browsers processed: 1
+2025-11-25 14:52:16 - [INFO] - Successfully cleared: 1
+2025-11-25 14:52:16 - [INFO] - Failed to clear: 0
+2025-11-25 14:52:16 - [INFO] - Mode: Graceful cleanup (Partial deletion, skips locked files)
+2025-11-25 14:52:16 - [INFO] - Note: To delete Ctrl+H browsing history, use -ForceCloseBrowsers parameter
+2025-11-25 14:52:16 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-25 14:52:16 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-25 14:52:16 - [INFO] - Exit Code: 0 (Success)
+2025-11-25 14:53:44 - [INFO] - Administrator privileges confirmed.
+2025-11-25 14:53:44 - [INFO] - Starting browser history cleanup process...
+2025-11-25 14:53:44 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 14:53:44 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 14:53:44 - [INFO] - Attempting to clear Edge history...
+2025-11-25 14:53:44 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 14:53:44 - [WARNING] - Edge is running with 8 process(es). Closing to enable complete history deletion...
+2025-11-25 14:53:44 - [SUCCESS] - Successfully closed Edge processes.
+2025-11-25 14:53:47 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-25 14:53:47 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-25 14:53:47 - [SUCCESS] - Edge: Successfully deleted 2 history file(s)
+2025-11-25 14:53:47 - [SUCCESS] - Edge history processing completed
+2025-11-25 14:53:47 - [INFO] - ===== Execution Summary =====
+2025-11-25 14:53:47 - [INFO] - Total browsers processed: 1
+2025-11-25 14:53:47 - [INFO] - Successfully cleared: 1
+2025-11-25 14:53:47 - [INFO] - Failed to clear: 0
+2025-11-25 14:53:47 - [INFO] - Mode: Force close browsers (Complete history deletion including Ctrl+H)
+2025-11-25 14:53:47 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-25 14:53:47 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-25 14:53:47 - [INFO] - Exit Code: 0 (Success)
+2025-11-25 15:52:41 - [INFO] - Administrator privileges confirmed.
+2025-11-25 15:52:41 - [INFO] - Starting browser history cleanup process...
+2025-11-25 15:52:41 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 15:52:41 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 15:52:41 - [INFO] - Attempting to clear Edge history...
+2025-11-25 15:52:41 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 15:52:41 - [INFO] - Edge is currently running with 12 process(es). Will attempt to clear unlocked history files only.
+2025-11-25 15:52:41 - [INFO] - Use -ForceCloseBrowsers parameter to close Edge and delete Ctrl+H history completely.
+2025-11-25 15:52:41 - [WARNING] - Skipped locked file (browser running): C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-25 15:52:41 - [WARNING] - Skipped locked file (browser running): C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-25 15:52:41 - [INFO] - Edge: Skipped 2 locked file(s) (browser is running)
+2025-11-25 15:52:41 - [SUCCESS] - Edge history processing completed
+2025-11-25 15:52:41 - [INFO] - ===== Execution Summary =====
+2025-11-25 15:52:41 - [INFO] - Total browsers processed: 1
+2025-11-25 15:52:41 - [INFO] - Successfully cleared: 1
+2025-11-25 15:52:41 - [INFO] - Failed to clear: 0
+2025-11-25 15:52:41 - [INFO] - Mode: Graceful cleanup (Partial deletion, skips locked files)
+2025-11-25 15:52:41 - [INFO] - Note: To delete Ctrl+H browsing history, use -ForceCloseBrowsers parameter
+2025-11-25 15:52:41 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-25 15:52:41 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-25 15:52:41 - [INFO] - Exit Code: 0 (Success)
+2025-11-25 15:54:59 - [INFO] - Administrator privileges confirmed.
+2025-11-25 15:54:59 - [INFO] - Starting browser history cleanup process...
+2025-11-25 15:54:59 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 15:54:59 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 15:54:59 - [INFO] - Attempting to clear Edge history...
+2025-11-25 15:54:59 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 15:54:59 - [WARNING] - Edge is running with 12 process(es). Closing to enable complete history deletion...
+2025-11-25 15:54:59 - [SUCCESS] - Successfully closed Edge processes.
+2025-11-25 15:55:02 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-25 15:55:02 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-25 15:55:02 - [SUCCESS] - Edge: Successfully deleted 2 history file(s)
+2025-11-25 15:55:02 - [SUCCESS] - Edge history processing completed
+2025-11-25 15:55:02 - [INFO] - ===== Execution Summary =====
+2025-11-25 15:55:02 - [INFO] - Total browsers processed: 1
+2025-11-25 15:55:02 - [INFO] - Successfully cleared: 1
+2025-11-25 15:55:02 - [INFO] - Failed to clear: 0
+2025-11-25 15:55:02 - [INFO] - Mode: Force close browsers (Complete history deletion including Ctrl+H)
+2025-11-25 15:55:02 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-25 15:55:02 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-25 15:55:02 - [INFO] - Exit Code: 0 (Success)

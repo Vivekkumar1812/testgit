@@ -1,7 +1,7 @@
 # Clear Browser History Script - Scope Document
 
 ## Project Overview
-PowerShell script to clear browsing history from Google Chrome and Microsoft Edge browsers with comprehensive logging and error handling.
+PowerShell script to clear main browsing history (Ctrl+H history) from Google Chrome and Microsoft Edge browsers. Features intelligent process detection, optional browser closure, graceful file lock handling, and comprehensive logging with error handling. Preserves bookmarks, passwords, and other browser data while targeting only core history files.
 
 ---
 
@@ -30,11 +30,11 @@ PowerShell script to clear browsing history from Google Chrome and Microsoft Edg
    - Clear saved passwords (with additional security confirmation)
    - Clear extensions data
 
-### 5. **Process Management**
-   - Detect running browser processes
-   - Automatically close browsers before cleanup
+### 5. **Advanced Process Management**
+   - ✓ Detect running browser processes (Implemented)
+   - ✓ Automatically close browsers before cleanup (Implemented with -ForceCloseBrowsers)
    - Restart browsers after cleanup (optional)
-   - Handle locked files more gracefully
+   - ✓ Handle locked files more gracefully (Implemented)
 
 ### 6. **Reporting and Analytics**
    - Email summary reports to administrators
@@ -48,10 +48,12 @@ PowerShell script to clear browsing history from Google Chrome and Microsoft Edg
 ## In Scope Points (Current Implementation)
 
 ### ✓ **Core Functionality**
-   - Clear Chrome browser history file
-   - Clear Edge browser history file
+   - Clear Chrome browser history files (History, History-journal)
+   - Clear Edge browser history files (History, History-journal)
    - Administrator privilege verification
    - Target default user profiles only
+   - Optional browser process termination (-ForceCloseBrowsers parameter)
+   - Graceful handling of locked files when browsers are running
 
 ### ✓ **Logging System**
    - Timestamp-based logging
@@ -71,16 +73,28 @@ PowerShell script to clear browsing history from Google Chrome and Microsoft Edg
    - Total browsers processed
    - Multiple exit codes (0, 1, 2, 3)
 
+### ✓ **Process Management (Partial)**
+   - Detect running browser processes
+   - Optional automatic browser closure (-ForceCloseBrowsers)
+   - File lock detection and graceful handling
+   - Process termination with safety delays
+
 ### ✓ **Documentation**
    - Comprehensive script header
    - Variable descriptions
    - Usage examples
    - Dependency information
+   - Built-in help system (-Help parameter)
 
 ### ✓ **Basic Validation**
    - Check for administrator rights
    - Verify browser profile paths
    - Validate file operations
+   - File accessibility testing before deletion
+
+### ✓ **Command Line Parameters**
+   - -ForceCloseBrowsers: Automatically close browsers for complete cleanup
+   - -Help: Display usage information and examples
 
 ---
 
@@ -122,10 +136,11 @@ PowerShell script to clear browsing history from Google Chrome and Microsoft Edg
    - Not supporting mobile browser cleanup
    - Not clearing Android/iOS browser data
 
-### ❌ **Database Manipulation**
-   - Not directly editing SQLite database files
+### ❌ **Advanced Database Manipulation**
+   - ✓ Deletes entire SQLite database files (History, History-journal) - Implemented
    - Not performing selective SQL queries on history databases
    - Not merging or splitting database files
+   - Not editing specific records within databases
 
 ### ❌ **User Interaction**
    - No interactive prompts during execution

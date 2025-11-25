@@ -13,13 +13,17 @@ SUPPORT                 NA
 DEX TOOLS               NA
 DEPENDENCIES            - PowerShell 5.1 or later (Windows 10/11 default)
                         - Administrator privileges required
+                        - Browsers: Google Chrome, Microsoft Edge should be closed for complete history deletion
+
 CONTEXT                 User
 OS                      Windows
 SYNOPSIS                Clears browsing history for Chrome and Edge browsers.
-DESCRIPTION             This script clears browsing history files from Google Chrome and Microsoft Edge browsers. 
-                        It removes only the History file from each browser's default profile directory. All operations 
-                        are logged with timestamps, error handling, and validation checks. The script requires 
-                        administrator privileges to access and delete browser history files.
+DESCRIPTION             This script clears the main browsing history from Google Chrome and Microsoft Edge browsers. 
+                        It removes only the core History database (Ctrl+H history) and its transaction journal, 
+                        leaving other browser data like bookmarks, saved passwords, and site preferences intact. 
+                        The script can optionally close running browsers to ensure complete main history deletion. 
+                        All operations are logged with timestamps, error handling, and validation checks. The script 
+                        requires administrator privileges to access and delete browser history files and terminate processes.
 INPUTS                  None - Script operates on default browser profile paths:
                             - Chrome: $env:LOCALAPPDATA\Google\Chrome\User Data\Default
                             - Edge: $env:LOCALAPPDATA\Microsoft\Edge\User Data\Default
@@ -38,6 +42,11 @@ VARIABLE DESCRIPTION    $MyInvocation = Contains information about how the scrip
 EXAMPLE                 .\clear_browser_history.ps1
 LOGIC DOCUMENT          NA          
 #>
+
+# Script parameters
+param(
+    [switch]$ForceCloseBrowsers
+)
 
 # Getting current script path and name
 $ScriptName = & { $MyInvocation.ScriptName }
@@ -79,10 +88,49 @@ try {
 $chromeHistryPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
 $edgeHistryPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
 
-#Files related only to browsing history
+#Files related to main browsing history only
 $historyFiles = @(
-    "History"
+    "History",
+    "History-journal"
 )
+
+# Function to check if browser is running and optionally close it
+function Test-BrowserRunning {
+    param(
+        [string]$browserName,
+        [bool]$forceClose = $false
+    )
+    
+    $processNames = @()
+    switch ($browserName) {
+        "Chrome" { $processNames = @("chrome") }
+        "Edge" { $processNames = @("msedge") }
+    }
+    
+    foreach ($processName in $processNames) {
+        $processes = Get-Process -Name $processName -ErrorAction SilentlyContinue
+        if ($processes) {
+            if ($forceClose) {
+                Write_LogMessage "$browserName is running with $($processes.Count) process(es). Closing to enable complete history deletion..." -Level 'WARNING'
+                try {
+                    $processes | Stop-Process -Force -ErrorAction Stop
+                    Write_LogMessage "Successfully closed $browserName processes." -Level 'SUCCESS'
+                    Start-Sleep -Seconds 3  # Wait for processes to fully terminate and release file locks
+                    return $false  # Browser is no longer running
+                } catch {
+                    Write_LogMessage "Failed to close $browserName processes: $_" -Level 'ERROR'
+                    return $true   # Still running
+                }
+            } else {
+                Write_LogMessage "$browserName is currently running with $($processes.Count) process(es). Will attempt to clear unlocked history files only." -Level 'INFO'
+                Write_LogMessage "Use -ForceCloseBrowsers parameter to close $browserName and delete Ctrl+H history completely." -Level 'INFO'
+                return $true
+            }
+        }
+    }
+    return $false
+}
+
 # Function to delete history files
 function Clear-BrowserHistory {
     param(
@@ -92,30 +140,85 @@ function Clear-BrowserHistory {
     try {
         if (-not $browserHistoryPath) {
             Write_LogMessage "Browser history path is empty for $browserName" -Level 'ERROR'
-            return
+            return $false
         }
         
         if (Test-Path $browserHistoryPath) {
             Write_LogMessage "Processing $browserName browser history at: $browserHistoryPath" -Level 'INFO'
             
+            # Check if browser is running (and optionally close it)
+            $browserRunning = Test-BrowserRunning -browserName $browserName -forceClose $ForceCloseBrowsers
+            
+            $filesDeleted = 0
+            $filesLocked = 0
+            $filesSkipped = 0
+            
             foreach ($file in $historyFiles) {
                 $targetFile = Join-Path $browserHistoryPath $file
                 if (Test-Path $targetFile) {
                     try {
-                        Remove-Item $targetFile -Force -ErrorAction Stop
-                        Write_LogMessage "Successfully deleted: $targetFile" -Level 'SUCCESS'
+                        # Test if file is accessible before attempting deletion
+                        $fileStream = $null
+                        try {
+                            $fileStream = [System.IO.File]::Open($targetFile, 'Open', 'Read', 'None')
+                            $fileStream.Close()
+                            $canAccess = $true
+                        } catch {
+                            $canAccess = $false
+                        }
+                        
+                        if ($canAccess) {
+                            Remove-Item $targetFile -Force -ErrorAction Stop
+                            Write_LogMessage "Successfully deleted: $targetFile" -Level 'SUCCESS'
+                            $filesDeleted++
+                        } else {
+                            if ($browserRunning) {
+                                Write_LogMessage "Skipped locked file (browser running): $targetFile" -Level 'WARNING'
+                                $filesSkipped++
+                            } else {
+                                Write_LogMessage "File is locked by another process: $targetFile" -Level 'ERROR'
+                                $filesLocked++
+                            }
+                        }
                     } catch {
-                        Write_LogMessage "Failed to delete: $targetFile. Error: $_" -Level 'ERROR'
+                        if ($_.Exception.Message -like "*being used by another process*" -or 
+                            $_.Exception.Message -like "*cannot access the file*") {
+                            if ($browserRunning) {
+                                Write_LogMessage "Skipped locked file (browser running): $targetFile" -Level 'WARNING'
+                                $filesSkipped++
+                            } else {
+                                Write_LogMessage "File is locked by another process: $targetFile" -Level 'ERROR'
+                                $filesLocked++
+                            }
+                        } else {
+                            Write_LogMessage "Failed to delete: $targetFile. Error: $_" -Level 'ERROR'
+                            $filesLocked++
+                        }
                     }
-                } else {
-                    Write_LogMessage "File not found: $targetFile" -Level 'WARNING'
                 }
             }
+            
+            # Summary for this browser
+            if ($filesDeleted -gt 0) {
+                Write_LogMessage "${browserName}: Successfully deleted $filesDeleted history file(s)" -Level 'SUCCESS'
+            }
+            if ($filesSkipped -gt 0) {
+                Write_LogMessage "${browserName}: Skipped $filesSkipped locked file(s) (browser is running)" -Level 'INFO'
+            }
+            if ($filesLocked -gt 0) {
+                Write_LogMessage "${browserName}: Failed to delete $filesLocked file(s) due to file locks" -Level 'ERROR'
+            }
+            
+            # Return true if we deleted at least some files or if browser is running (partial success)
+            return ($filesDeleted -gt 0 -or ($browserRunning -and $filesSkipped -gt 0))
+            
         } else {
             Write_LogMessage "$browserName browser profile not found at: $browserHistoryPath" -Level 'WARNING'
+            return $false
         }
     } catch {
         Write_LogMessage "Unexpected error processing $browserName history: $_" -Level 'ERROR'
+        return $false
     }
 }
 
@@ -132,13 +235,13 @@ try {
     if ($chromeHistryPath) {
         $totalBrowsers++
         Write_LogMessage "Attempting to clear Chrome history..." -Level 'INFO'
-        Clear-BrowserHistory -browserHistoryPath $chromeHistryPath -browserName "Chrome"
-        if (Test-Path (Join-Path $chromeHistryPath "History")) {
-            $failCount++
-            Write_LogMessage "Chrome history file still exists after cleanup attempt" -Level 'ERROR'
-        } else {
+        $chromeProcessed = Clear-BrowserHistory -browserHistoryPath $chromeHistryPath -browserName "Chrome"
+        if ($chromeProcessed) {
             $successCount++
-            Write_LogMessage "Chrome history cleared successfully" -Level 'SUCCESS'
+            Write_LogMessage "Chrome history processing completed" -Level 'SUCCESS'
+        } else {
+            # Browser profile not found or processing failed, don't count as success or failure for cleanup
+            $totalBrowsers--
         }
     } else {
         Write_LogMessage "Chrome history path is not defined" -Level 'ERROR'
@@ -148,13 +251,13 @@ try {
     if ($edgeHistryPath) {
         $totalBrowsers++
         Write_LogMessage "Attempting to clear Edge history..." -Level 'INFO'
-        Clear-BrowserHistory -browserHistoryPath $edgeHistryPath -browserName "Edge"
-        if (Test-Path (Join-Path $edgeHistryPath "History")) {
-            $failCount++
-            Write_LogMessage "Edge history file still exists after cleanup attempt" -Level 'ERROR'
-        } else {
+        $edgeProcessed = Clear-BrowserHistory -browserHistoryPath $edgeHistryPath -browserName "Edge"
+        if ($edgeProcessed) {
             $successCount++
-            Write_LogMessage "Edge history cleared successfully" -Level 'SUCCESS'
+            Write_LogMessage "Edge history processing completed" -Level 'SUCCESS'
+        } else {
+            # Browser profile not found or processing failed, don't count as success or failure for cleanup
+            $totalBrowsers--
         }
     } else {
         Write_LogMessage "Edge history path is not defined" -Level 'ERROR'
@@ -165,6 +268,13 @@ try {
     Write_LogMessage "Total browsers processed: $totalBrowsers" -Level 'INFO'
     Write_LogMessage "Successfully cleared: $successCount" -Level 'INFO'
     Write_LogMessage "Failed to clear: $failCount" -Level 'INFO'
+    
+    if ($ForceCloseBrowsers) {
+        Write_LogMessage "Mode: Force close browsers (Complete history deletion including Ctrl+H)" -Level 'INFO'
+    } else {
+        Write_LogMessage "Mode: Graceful cleanup (Partial deletion, skips locked files)" -Level 'INFO'
+        Write_LogMessage "Note: To delete Ctrl+H browsing history, use -ForceCloseBrowsers parameter" -Level 'INFO'
+    }
     
     if ($failCount -eq 0 -and $successCount -gt 0) {
         Write_LogMessage "Browser history cleanup process completed successfully." -Level 'SUCCESS'
