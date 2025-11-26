@@ -1,0 +1,33 @@
+2025-11-25 02:42:13 - [INFO] - Administrator privileges confirmed.
+2025-11-25 02:42:13 - [INFO] - Starting browser history cleanup process...
+2025-11-25 02:42:13 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 02:42:13 - [WARNING] - Chrome browser profile not found at: C:\WINDOWS\system32\config\systemprofile\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 02:42:13 - [INFO] - Attempting to clear Edge history...
+2025-11-25 02:42:13 - [WARNING] - Edge browser profile not found at: C:\WINDOWS\system32\config\systemprofile\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 02:42:13 - [INFO] - ===== Execution Summary =====
+2025-11-25 02:42:13 - [INFO] - Total browsers processed: 0
+2025-11-25 02:42:13 - [INFO] - Successfully cleared: 0
+2025-11-25 02:42:13 - [INFO] - Failed to clear: 0
+2025-11-25 02:42:13 - [INFO] - Mode: Graceful cleanup (Partial deletion, skips locked files)
+2025-11-25 02:42:13 - [INFO] - Note: To delete Ctrl+H browsing history, use -ForceCloseBrowsers parameter
+2025-11-25 02:42:13 - [WARNING] - No browser history was cleared.
+2025-11-25 02:42:13 - [WARNING] - ===== Script Execution Completed with Warnings =====
+2025-11-25 02:42:13 - [WARNING] - Exit Code: 3 (No Action Taken)
+
+
+2025-11-25 21:52:26 - [INFO] - Administrator privileges confirmed.
+2025-11-25 21:52:26 - [INFO] - Starting browser history cleanup process...
+2025-11-25 21:52:26 - [INFO] - Attempting to clear Chrome history...
+2025-11-25 21:52:26 - [WARNING] - Chrome browser profile not found at: C:\WINDOWS\ServiceProfiles\HiveStreamingService\AppData\Local\Google\Chrome\User Data\Default
+2025-11-25 21:52:26 - [SUCCESS] - Chrome history cleared successfully
+2025-11-25 21:52:26 - [INFO] - Attempting to clear Edge history...
+2025-11-25 21:52:26 - [WARNING] - Edge browser profile not found at: C:\WINDOWS\ServiceProfiles\HiveStreamingService\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-25 21:52:26 - [SUCCESS] - Edge history cleared successfully
+2025-11-25 21:52:26 - [INFO] - ===== Execution Summary =====
+2025-11-25 21:52:26 - [INFO] - Total browsers processed: 2
+2025-11-25 21:52:26 - [INFO] - Successfully cleared: 2
+2025-11-25 21:52:26 - [INFO] - Failed to clear: 0
+2025-11-25 21:52:26 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-25 21:52:26 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-25 21:52:26 - [INFO] - Exit Code: 0 (Success)
+2025-11-25 21:55:45 - [ERROR] - This script must be run as Administrator. Please run PowerShell as Administrator and try again.

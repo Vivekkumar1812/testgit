@@ -81,3 +81,4 @@
 2025-11-25 15:55:02 - [SUCCESS] - Browser history cleanup process completed successfully.
 2025-11-25 15:55:02 - [INFO] - ===== Script Execution Completed Successfully =====
 2025-11-25 15:55:02 - [INFO] - Exit Code: 0 (Success)
+2025-11-25 20:38:37 - [ERROR] - This script must be run as Administrator. Please run PowerShell as Administrator and try again.
