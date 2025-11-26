@@ -24,9 +24,9 @@ DESCRIPTION             This script clears the main browsing history from Google
                         The script can optionally close running browsers to ensure complete main history deletion. 
                         All operations are logged with timestamps, error handling, and validation checks. The script 
                         requires administrator privileges to access and delete browser history files and terminate processes.
-INPUTS                  None - Script operates on default browser profile paths:
-                            - Chrome: $env:LOCALAPPDATA\Google\Chrome\User Data\Default
-                            - Edge: $env:LOCALAPPDATA\Microsoft\Edge\User Data\Default
+INPUTS                  None - Script automatically detects user profile paths even when run as Administrator:
+                            - Chrome: [UserProfile]\AppData\Local\Google\Chrome\User Data\Default
+                            - Edge: [UserProfile]\AppData\Local\Microsoft\Edge\User Data\Default
 OUTPUTS                 Log messages indicating:
                             - Admin privilege check status
                             - Browser history processing status
@@ -36,6 +36,9 @@ VARIABLE DESCRIPTION    $MyInvocation = Contains information about how the scrip
                         $ScriptName = Stores the name of the script file without extension
                         $ScriptPath = Stores the directory path where the script is located
                         $logFile = Full path to the log file where all activities are recorded
+                        $currentUserSID = Security Identifier of the current user to locate correct profile
+                        $userProfilePath = Actual user profile path (not system account when run as Admin)
+                        $userLocalAppData = User's AppData\Local directory path
                         $chromeHistryPath = Path to Chrome browser history directory
                         $edgeHistryPath = Path to Edge browser history directory
                         $historyFiles = Array of history files to delete
@@ -85,8 +88,35 @@ try {
 }
 
 # Define paths to browser history directories
-$chromeHistryPath = "$env:LOCALAPPDATA\Google\Chrome\User Data\Default"
-$edgeHistryPath = "$env:LOCALAPPDATA\Microsoft\Edge\User Data\Default"
+# When running as Administrator, $env:LOCALAPPDATA points to system account, not user account
+# We need to get the actual user's profile path
+$currentUserSID = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+$userProfilePath = (Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.SID -eq $currentUserSID }).LocalPath
+
+if (-not $userProfilePath) {
+    # Fallback: Try to get user profile from environment or registry
+    $userProfilePath = $env:USERPROFILE
+    if (-not $userProfilePath -or $userProfilePath -like "*system32*") {
+        # Last resort: Look for actual user profiles
+        $userProfiles = Get-ChildItem "C:\Users" -Directory | Where-Object { $_.Name -notmatch "^(Public|Default|All Users|Default User)$" }
+        if ($userProfiles.Count -eq 1) {
+            $userProfilePath = $userProfiles[0].FullName
+            Write_LogMessage "Auto-detected user profile: $userProfilePath" -Level 'INFO'
+        } else {
+            Write_LogMessage "Multiple user profiles found. Please specify which user's browser history to clear." -Level 'ERROR'
+            Write_LogMessage "Available profiles: $($userProfiles.Name -join ', ')" -Level 'INFO'
+            exit 1
+        }
+    }
+}
+
+$userLocalAppData = Join-Path $userProfilePath "AppData\Local"
+$chromeHistryPath = Join-Path $userLocalAppData "Google\Chrome\User Data\Default"
+$edgeHistryPath = Join-Path $userLocalAppData "Microsoft\Edge\User Data\Default"
+
+Write_LogMessage "Using user profile: $userProfilePath" -Level 'INFO'
+Write_LogMessage "Chrome profile path: $chromeHistryPath" -Level 'INFO'
+Write_LogMessage "Edge profile path: $edgeHistryPath" -Level 'INFO'
 
 #Files related to main browsing history only
 $historyFiles = @(
