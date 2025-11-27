@@ -1,0 +1,89 @@
+2025-11-27 12:32:50 - [INFO] - Administrator privileges confirmed.
+2025-11-27 12:32:50 - [INFO] - Force Close Browsers: Enabled
+2025-11-27 12:32:50 - [INFO] - Current user context: CORP\v1
+2025-11-27 12:32:51 - [INFO] - Using current user profile from SID lookup
+2025-11-27 12:32:51 - [INFO] - Using user profile: C:\Users\v1
+2025-11-27 12:32:51 - [INFO] - Chrome profile path: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 12:32:51 - [INFO] - Edge profile path: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 12:32:51 - [INFO] - Starting browser history cleanup process...
+2025-11-27 12:32:51 - [INFO] - Attempting to clear Chrome history...
+2025-11-27 12:32:51 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 12:32:51 - [INFO] - Attempting to clear Edge history...
+2025-11-27 12:32:51 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 12:32:51 - [WARNING] - Edge is running with 9 process(es). Closing to enable complete history deletion...
+2025-11-27 12:32:51 - [SUCCESS] - Successfully closed Edge processes.
+2025-11-27 12:32:54 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-27 12:32:54 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-27 12:32:54 - [SUCCESS] - Edge: Successfully deleted 2 history file(s)
+2025-11-27 12:32:54 - [SUCCESS] - Edge history processing completed
+2025-11-27 12:32:54 - [INFO] - ===== Execution Summary =====
+2025-11-27 12:32:54 - [INFO] - Total browsers processed: 1
+2025-11-27 12:32:54 - [INFO] - Successfully cleared: 1
+2025-11-27 12:32:54 - [INFO] - Failed to clear: 0
+2025-11-27 12:32:54 - [INFO] - Mode: Force close browsers (Complete history deletion including Ctrl+H)
+2025-11-27 12:32:54 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-27 12:32:54 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-27 12:32:54 - [INFO] - Exit Code: 0 (Success)
+2025-11-27 12:33:51 - [INFO] - Administrator privileges confirmed.
+2025-11-27 12:33:51 - [INFO] - Target User Parameter: test
+2025-11-27 12:33:51 - [INFO] - Force Close Browsers: Enabled
+2025-11-27 12:33:51 - [ERROR] - Specified target user 'test' profile not found at C:\Users\test
+2025-11-27 12:33:51 - [INFO] - Available user profiles: admin, v1
+2025-11-27 13:00:57 - [INFO] - Administrator privileges confirmed.
+2025-11-27 13:00:57 - [INFO] - Target User Parameter: v1
+2025-11-27 13:00:57 - [INFO] - Force Close Browsers: Enabled
+2025-11-27 13:00:57 - [INFO] - Using specified target user: v1 at C:\Users\v1
+2025-11-27 13:00:57 - [INFO] - Using user profile: C:\Users\v1
+2025-11-27 13:00:57 - [INFO] - Chrome profile path: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 13:00:57 - [INFO] - Edge profile path: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 13:00:57 - [INFO] - Starting browser history cleanup process...
+2025-11-27 13:00:57 - [INFO] - Attempting to clear Chrome history...
+2025-11-27 13:00:57 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 13:00:57 - [INFO] - Attempting to clear Edge history...
+2025-11-27 13:00:58 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 13:00:58 - [INFO] - ===== Execution Summary =====
+2025-11-27 13:00:58 - [INFO] - Total browsers processed: 0
+2025-11-27 13:00:58 - [INFO] - Successfully cleared: 0
+2025-11-27 13:00:58 - [INFO] - Failed to clear: 0
+2025-11-27 13:00:58 - [INFO] - Mode: Force close browsers (Complete history deletion including Ctrl+H)
+2025-11-27 13:00:58 - [WARNING] - No browser history was cleared.
+2025-11-27 13:00:58 - [WARNING] - ===== Script Execution Completed with Warnings =====
+2025-11-27 13:00:58 - [WARNING] - Exit Code: 3 (No Action Taken)
+2025-11-27 13:03:46 - [INFO] - Administrator privileges confirmed.
+2025-11-27 13:03:46 - [INFO] - Target User Parameter: v1
+2025-11-27 13:03:46 - [INFO] - Force Close Browsers: Enabled
+2025-11-27 13:03:46 - [INFO] - Using specified target user: v1 at C:\Users\v1
+2025-11-27 13:03:46 - [INFO] - Using user profile: C:\Users\v1
+2025-11-27 13:03:46 - [INFO] - Chrome profile path: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 13:03:46 - [INFO] - Edge profile path: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 13:03:47 - [INFO] - Starting browser history cleanup process...
+2025-11-27 13:03:47 - [INFO] - Attempting to clear Chrome history...
+2025-11-27 13:03:47 - [WARNING] - Chrome browser profile not found at: C:\Users\v1\AppData\Local\Google\Chrome\User Data\Default
+2025-11-27 13:03:47 - [INFO] - Attempting to clear Edge history...
+2025-11-27 13:03:47 - [INFO] - Processing Edge browser history at: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default
+2025-11-27 13:03:47 - [WARNING] - Edge is running with 10 process(es). Closing to enable complete history deletion...
+2025-11-27 13:03:47 - [SUCCESS] - Successfully closed Edge processes.
+2025-11-27 13:03:50 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History
+2025-11-27 13:03:50 - [SUCCESS] - Successfully deleted: C:\Users\v1\AppData\Local\Microsoft\Edge\User Data\Default\History-journal
+2025-11-27 13:03:50 - [SUCCESS] - Edge: Successfully deleted 2 history file(s)
+2025-11-27 13:03:50 - [SUCCESS] - Edge history processing completed
+2025-11-27 13:03:50 - [INFO] - ===== Execution Summary =====
+2025-11-27 13:03:50 - [INFO] - Total browsers processed: 1
+2025-11-27 13:03:50 - [INFO] - Successfully cleared: 1
+2025-11-27 13:03:50 - [INFO] - Failed to clear: 0
+2025-11-27 13:03:50 - [INFO] - Mode: Force close browsers (Complete history deletion including Ctrl+H)
+2025-11-27 13:03:50 - [SUCCESS] - Browser history cleanup process completed successfully.
+2025-11-27 13:03:50 - [INFO] - ===== Script Execution Completed Successfully =====
+2025-11-27 13:03:50 - [INFO] - Exit Code: 0 (Success)
+2025-11-27 13:05:05 - [INFO] - Administrator privileges confirmed.
+2025-11-27 13:05:05 - [INFO] - Target User Parameter: v2
+2025-11-27 13:05:05 - [INFO] - Force Close Browsers: Enabled
+2025-11-27 13:05:05 - [ERROR] - Specified target user 'v2' profile not found at C:\Users\v2
+2025-11-27 13:05:05 - [INFO] - Available user profiles: admin, v1
+2025-11-27 14:15:29 - [INFO] - Administrator privileges confirmed.
+2025-11-27 14:15:29 - [ERROR] - Error: Username not provided. TargetUser parameter is required.
+2025-11-27 14:15:29 - [INFO] - Available user profiles: admin, v1
+2025-11-27 14:15:29 - [INFO] - Usage: .\clear_browser_history.ps1 -TargetUser '<username>'
+2025-11-27 14:15:29 - [INFO] - Example: .\clear_browser_history.ps1 -TargetUser 'john.doe'
+2025-11-27 14:15:29 - [ERROR] - ===== Script Execution Failed =====
+2025-11-27 14:15:29 - [ERROR] - Exit Code: 1 (Missing Required Parameter)
