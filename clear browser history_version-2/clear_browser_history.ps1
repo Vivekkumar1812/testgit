@@ -24,31 +24,47 @@ DESCRIPTION             This script clears the main browsing history from Google
                         The script can optionally close running browsers to ensure complete main history deletion. 
                         All operations are logged with timestamps, error handling, and validation checks. The script 
                         requires administrator privileges to access and delete browser history files and terminate processes.
-INPUTS                  None - Script automatically detects user profile paths even when run as Administrator:
-                            - Chrome: [UserProfile]\AppData\Local\Google\Chrome\User Data\Default
-                            - Edge: [UserProfile]\AppData\Local\Microsoft\Edge\User Data\Default
+INPUTS                  -TargetUser (Required): Specify the username whose browser history should be cleared
+                                               Example: "john.doe" or "DOMAIN\john.doe"
+                        -ForceCloseBrowsers (Optional): Switch to force close running browsers before deletion
+                        
+                        Target paths for browser history:
+                            - Chrome: C:\Users\[TargetUser]\AppData\Local\Google\Chrome\User Data\Default
+                            - Edge: C:\Users\[TargetUser]\AppData\Local\Microsoft\Edge\User Data\Default
 OUTPUTS                 Log messages indicating:
                             - Admin privilege check status
                             - Browser history processing status
                             - File deletion success or failure
                             - Final execution summary with exit codes
-VARIABLE DESCRIPTION    $MyInvocation = Contains information about how the script was invoked, used for log file naming
+VARIABLE DESCRIPTION    $TargetUser = Required parameter to specify target username for browser history cleanup
+                        $ForceCloseBrowsers = Switch parameter to force close running browsers
+                        $MyInvocation = Contains information about how the script was invoked, used for log file naming
                         $ScriptName = Stores the name of the script file without extension
                         $ScriptPath = Stores the directory path where the script is located
                         $logFile = Full path to the log file where all activities are recorded
-                        $currentUserSID = Security Identifier of the current user to locate correct profile
-                        $userProfilePath = Actual user profile path (not system account when run as Admin)
+                        $targetUserName = Processed target username (with domain prefix removed if present)
+                        $userProfilePath = Target user profile path based on TargetUser parameter
                         $userLocalAppData = User's AppData\Local directory path
                         $chromeHistryPath = Path to Chrome browser history directory
                         $edgeHistryPath = Path to Edge browser history directory
                         $historyFiles = Array of history files to delete
-EXAMPLE                 .\clear_browser_history.ps1
+EXAMPLE                 PowerShell (.ps1) Usage:
+                        .\clear_browser_history.ps1 -TargetUser "john.doe"
+                        .\clear_browser_history.ps1 -TargetUser "john.doe" -ForceCloseBrowsers
+                        .\clear_browser_history.ps1 -TargetUser "DOMAIN\john.doe" -ForceCloseBrowsers
+                        
+                        Batch File (.bat) Usage:
+                        clear_browser_history_force.bat "john.doe"
+                        clear_browser_history_force.bat "DOMAIN\john.doe"
 LOGIC DOCUMENT          NA          
 #>
 
 # Script parameters
 param(
-    [switch]$ForceCloseBrowsers
+    [switch]$ForceCloseBrowsers,
+    
+    [Parameter(Mandatory=$false, HelpMessage="Specify the username whose browser history should be cleared (e.g., 'john.doe' or 'DOMAIN\john.doe')")]
+    [string]$TargetUser
 )
 
 # Getting current script path and name
@@ -87,27 +103,59 @@ try {
     exit 1
 }
 
-# Define paths to browser history directories
-# When running as Administrator, $env:LOCALAPPDATA points to system account, not user account
-# We need to get the actual user's profile path
-$currentUserSID = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
-$userProfilePath = (Get-WmiObject -Class Win32_UserProfile | Where-Object { $_.SID -eq $currentUserSID }).LocalPath
-
-if (-not $userProfilePath) {
-    # Fallback: Try to get user profile from environment or registry
-    $userProfilePath = $env:USERPROFILE
-    if (-not $userProfilePath -or $userProfilePath -like "*system32*") {
-        # Last resort: Look for actual user profiles
-        $userProfiles = Get-ChildItem "C:\Users" -Directory | Where-Object { $_.Name -notmatch "^(Public|Default|All Users|Default User)$" }
-        if ($userProfiles.Count -eq 1) {
-            $userProfilePath = $userProfiles[0].FullName
-            Write_LogMessage "Auto-detected user profile: $userProfilePath" -Level 'INFO'
-        } else {
-            Write_LogMessage "Multiple user profiles found. Please specify which user's browser history to clear." -Level 'ERROR'
-            Write_LogMessage "Available profiles: $($userProfiles.Name -join ', ')" -Level 'INFO'
-            exit 1
+# Validate TargetUser parameter
+if (-not $TargetUser -or $TargetUser.Trim() -eq "") {
+    Write_LogMessage "Error: Username not provided. TargetUser parameter is required." -Level 'ERROR'
+    
+    # List available user profiles to help user
+    try {
+        $availableProfiles = Get-ChildItem "C:\Users" -Directory | Where-Object { 
+            $_.Name -notmatch "^(Public|Default|All Users|Default User)$" 
         }
+        if ($availableProfiles) {
+            Write_LogMessage "Available user profiles: $($availableProfiles.Name -join ', ')" -Level 'INFO'
+        } else {
+            Write_LogMessage "No user profiles found in C:\Users directory." -Level 'INFO'
+        }
+    } catch {
+        Write_LogMessage "Failed to enumerate user profiles: $_" -Level 'WARNING'
     }
+    
+    Write_LogMessage "===== Script Execution Failed =====" -Level 'ERROR'
+    Write_LogMessage "Exit Code: 1 (Missing Required Parameter)" -Level 'ERROR'
+    exit 1
+}
+
+# Log script parameters
+Write_LogMessage "Target User Parameter: $TargetUser" -Level 'INFO'
+if ($ForceCloseBrowsers) {
+    Write_LogMessage "Force Close Browsers: Enabled" -Level 'INFO'
+} else {
+    Write_LogMessage "Force Close Browsers: Disabled (will skip locked files)" -Level 'INFO'
+}
+
+# Define paths to browser history directories
+# Handle domain users (remove domain prefix if present)
+$targetUserName = $TargetUser
+if ($TargetUser.Contains('\')) {
+    $targetUserName = $TargetUser.Split('\')[1]
+    Write_LogMessage "Detected domain user format. Using username: $targetUserName" -Level 'INFO'
+}
+
+$userProfilePath = "C:\Users\$targetUserName"
+if (Test-Path $userProfilePath) {
+    Write_LogMessage "Using specified target user: $targetUserName at $userProfilePath" -Level 'INFO'
+} else {
+    Write_LogMessage "Specified target user '$targetUserName' profile not found at $userProfilePath" -Level 'ERROR'
+    
+    # List available user profiles to help user
+    $availableProfiles = Get-ChildItem "C:\Users" -Directory | Where-Object { 
+        $_.Name -notmatch "^(Public|Default|All Users|Default User)$" 
+    }
+    if ($availableProfiles) {
+        Write_LogMessage "Available user profiles: $($availableProfiles.Name -join ', ')" -Level 'INFO'
+    }
+    exit 1
 }
 
 $userLocalAppData = Join-Path $userProfilePath "AppData\Local"
