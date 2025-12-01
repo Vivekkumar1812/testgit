@@ -1,0 +1,29 @@
+﻿{
+    "RepairResults":  {
+                          "RebootRequired":  false,
+                          "DISMRestoreHealthSuccess":  true,
+                          "FinalDiskSpaceGB":  38.58,
+                          "SFCCorruptionFixed":  false,
+                          "SFCCorruptionFound":  false,
+                          "SFCDuration":  "4 minutes 52 seconds",
+                          "SFCSuccess":  true,
+                          "DISMScanHealthSuccess":  true,
+                          "DISMCheckHealthSuccess":  true,
+                          "InitialDiskSpaceGB":  38.68,
+                          "CheckHealthDuration":  "2 seconds",
+                          "PendingRebootDetected":  false,
+                          "ScanHealthDuration":  "5 minutes 1 seconds",
+                          "RestoreHealthDuration":  "Not Required (No Corruption)",
+                          "TotalDuration":  "9 minutes 58 seconds"
+                      },
+    "ExitCode":  0,
+    "LogFilePath":  "C:\\Users\\v1\\Desktop\\DeM Tool project\\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt",
+    "Metadata":  {
+                     "ScriptName":  "19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure.ps1",
+                     "WindowsVersion":  "10.0.26200",
+                     "ExecutionTime":  "11:25:44",
+                     "ExecutionDate":  "2025-12-01",
+                     "ComputerName":  "MUMONPREM037",
+                     "WindowsBuild":  "26200"
+                 }
+}

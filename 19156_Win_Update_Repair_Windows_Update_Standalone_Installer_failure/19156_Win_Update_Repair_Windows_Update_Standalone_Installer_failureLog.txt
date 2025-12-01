@@ -1,0 +1,137 @@
+2025-12-01 11:15:46 ------------------------------------------------------------------------------------
+2025-12-01 11:15:46 #####################Starting DISM + SFC System Repair Process#####################
+2025-12-01 11:15:46 ------------------------------------------------------------------------------------
+2025-12-01 11:15:46 Log file created at: C:\Users\v1\Desktop\DeM Tool project\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt
+2025-12-01 11:15:46 Microsoft Official Procedure: DISM (Component Store) → SFC (System Files)
+2025-12-01 11:15:46 
+2025-12-01 11:15:46 ==========================================
+2025-12-01 11:15:46 Starting DISM + SFC System Repair Process
+2025-12-01 11:15:46 ==========================================
+2025-12-01 11:15:46 Process Start Time: 2025-12-01 11:15:46
+2025-12-01 11:15:46 === Validating System Requirements ===
+2025-12-01 11:15:47 Operating System: Microsoft Windows 11 Pro (Build 26200)
+2025-12-01 11:15:47 System Architecture: 64-bit
+2025-12-01 11:15:47 Administrator privileges: Confirmed
+2025-12-01 11:15:47 PowerShell Version: 5.1
+2025-12-01 11:15:47 System Drive: C:
+2025-12-01 11:15:47 Available Disk Space: 38.68 GB
+2025-12-01 11:15:47 System requirements validation: PASSED
+2025-12-01 11:15:47 
+2025-12-01 11:15:47 === Checking for Pending System Reboot ===
+2025-12-01 11:15:47 Result: No pending reboot detected
+2025-12-01 11:15:47 Status: System is in clean state for repair operations
+2025-12-01 11:15:47 DISM Executable Location: C:\WINDOWS\System32\dism.exe
+2025-12-01 11:15:47 Disk Space Check (Before CheckHealth): 38.68 GB available on C:
+2025-12-01 11:15:47 Status: Sufficient disk space available
+2025-12-01 11:15:47 
+2025-12-01 11:15:47 ==========================================
+2025-12-01 11:15:47 PHASE 1: DISM CheckHealth Scan
+2025-12-01 11:15:47 ==========================================
+2025-12-01 11:15:47 Description: Quick check to determine if the image has been flagged as corrupted
+2025-12-01 11:15:47 Expected Duration: 5-15 seconds
+2025-12-01 11:15:47 Starting DISM CheckHealth at: 2025-12-01 11:15:47
+2025-12-01 11:15:47 Executing: DISM.exe /Online /Cleanup-Image /CheckHealth
+2025-12-01 11:15:49 DISM CheckHealth completed at: 2025-12-01 11:15:49
+2025-12-01 11:15:49 Duration: 2 seconds
+2025-12-01 11:15:49 Exit Code: 0
+2025-12-01 11:15:49 Result: No component store corruption detected
+2025-12-01 11:15:49 Disk Space Check (Before ScanHealth): 38.68 GB available on C:
+2025-12-01 11:15:49 Status: Sufficient disk space available
+2025-12-01 11:15:49 
+2025-12-01 11:15:49 ==========================================
+2025-12-01 11:15:49 PHASE 2: DISM ScanHealth Deep Scan
+2025-12-01 11:15:49 ==========================================
+2025-12-01 11:15:49 Description: Thorough scan to check for component store corruption
+2025-12-01 11:15:49 Expected Duration: 5-15 minutes
+2025-12-01 11:15:49 Starting DISM ScanHealth at: 2025-12-01 11:15:49
+2025-12-01 11:15:49 NOTE: This operation may take several minutes. Please wait...
+2025-12-01 11:15:49 Executing: DISM.exe /Online /Cleanup-Image /ScanHealth
+2025-12-01 11:20:51 DISM ScanHealth completed at: 2025-12-01 11:20:51
+2025-12-01 11:20:51 Duration: 5 minutes 1 seconds
+2025-12-01 11:20:51 Exit Code: 0
+2025-12-01 11:20:51 Result: No corruption found in component store
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 No corruption detected - RestoreHealth repair not required
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 Proceeding to Phase 4: SFC scan (Tier 2 System32 file repair)
+2025-12-01 11:20:51 Microsoft Guidance: Always run SFC after DISM for complete repair coverage
+2025-12-01 11:20:51 SFC Executable Location: C:\WINDOWS\System32\sfc.exe
+2025-12-01 11:20:51 Disk Space Check (Before SFC Scan): 38.58 GB available on C:
+2025-12-01 11:20:51 Status: Sufficient disk space available
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 ==========================================
+2025-12-01 11:20:51 PHASE 4: System File Checker (SFC) Scan
+2025-12-01 11:20:51 ==========================================
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 WHAT: Scanning and repairing corrupted system files in System32
+2025-12-01 11:20:51 WHY: SFC fixes Tier 2 active DLL files used by Windows Update components
+2025-12-01 11:20:51 HOW: Validates files against WinSxS component store (repaired by DISM)
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 Starting SFC /scannow at: 2025-12-01 11:20:51
+2025-12-01 11:20:51 Expected Duration: 10-60 minutes depending on system state
+2025-12-01 11:20:51 
+2025-12-01 11:20:51 Executing: C:\WINDOWS\System32\sfc.exe /scannow
+2025-12-01 11:20:51 Please wait - SFC is scanning protected system files...
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 SFC scan completed at: 2025-12-01 11:25:44
+2025-12-01 11:25:44 Duration: 4 minutes 52 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 SFC Exit Code: 0
+2025-12-01 11:25:44 RESULT: No integrity violations detected
+2025-12-01 11:25:44 STATUS: System files are healthy - no repair needed
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 ==========================================
+2025-12-01 11:25:44 DISM + SFC Repair Process Completed
+2025-12-01 11:25:44 ==========================================
+2025-12-01 11:25:44 Process End Time: 2025-12-01 11:25:44
+2025-12-01 11:25:44 Total Duration: 9 minutes 58 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 === DETAILED SUMMARY REPORT ===
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 TIER 1: DISM Component Store Repair (WinSxS)
+2025-12-01 11:25:44 ---------------------------------------------
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 PHASE 1 - CheckHealth:
+2025-12-01 11:25:44   Status: SUCCESS
+2025-12-01 11:25:44   Duration: 2 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 PHASE 2 - ScanHealth:
+2025-12-01 11:25:44   Status: SUCCESS
+2025-12-01 11:25:44   Duration: 5 minutes 1 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 PHASE 3 - RestoreHealth:
+2025-12-01 11:25:44   Status: SUCCESS
+2025-12-01 11:25:44   Duration: Not Required (No Corruption)
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 TIER 2: SFC System File Repair (System32)
+2025-12-01 11:25:44 ---------------------------------------------
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 PHASE 4 - SFC /scannow:
+2025-12-01 11:25:44   Status: SUCCESS
+2025-12-01 11:25:44   Corruption Found: NO
+2025-12-01 11:25:44   Corruption Fixed: N/A
+2025-12-01 11:25:44   Duration: 4 minutes 52 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 TOTAL EXECUTION TIME: 9 minutes 58 seconds
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 DISK SPACE ANALYSIS:
+2025-12-01 11:25:44 ---------------------------------------------
+2025-12-01 11:25:44   Initial Free Space: 38.68 GB
+2025-12-01 11:25:44   Final Free Space: 38.58 GB
+2025-12-01 11:25:44   Space Consumed: 0.1 GB
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 FINAL RESULT: All repair operations completed successfully
+2025-12-01 11:25:44 SYSTEM STATUS: Component Store and System Files are healthy
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 Log file saved: C:\Users\v1\Desktop\DeM Tool project\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt
+2025-12-01 11:25:44 CBS.log location: C:\\Windows\\Logs\\CBS\\CBS.log (for detailed SFC results)
+2025-12-01 11:25:44 DISM.log location: C:\\Windows\\Logs\\DISM\\dism.log (for detailed DISM results)
+2025-12-01 11:25:44 
+2025-12-01 11:25:44 === Exporting Results to JSON ===
+2025-12-01 11:25:45 JSON export successful: C:\Users\v1\Desktop\DeM Tool project\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure-Results.json
+2025-12-01 11:25:45 File size: 1.6 KB
+2025-12-01 11:25:45 JSON results exported: C:\Users\v1\Desktop\DeM Tool project\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure-Results.json
+2025-12-01 11:25:45 #####################DISM + SFC Repair Process Ended#####################
+2025-12-01 11:25:45 
+2025-12-01 11:25:45 Script execution completed with exit code: 0
+2025-12-01 11:25:45 Exit Code Legend: 0=Success, 1=Failure, 2=Partial Success, 3=Administrator Required
