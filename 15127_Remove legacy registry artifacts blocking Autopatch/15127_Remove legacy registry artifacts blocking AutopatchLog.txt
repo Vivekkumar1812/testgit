@@ -1,0 +1,56 @@
+2025-12-05 14:50:08 - This script must be run as Administrator. Please run PowerShell as Administrator and try again.
+2025-12-05 14:52:15 - Administrator privileges confirmed.
+2025-12-05 14:52:15 - ==============================================
+2025-12-05 14:52:15 - Windows Autopatch Registry Cleanup - SYSTRAC
+2025-12-05 14:52:15 - ==============================================
+2025-12-05 14:52:15 - Script Version: 1.1
+2025-12-05 14:52:15 - Execution Time: 12/05/2025 14:52:15
+2025-12-05 14:52:15 - Computer Name: MUMONPREM037
+2025-12-05 14:52:15 - User Context: v1
+2025-12-05 14:52:15 - Domain: CORP
+2025-12-05 14:52:15 - Backup Enabled: YES (Automatic)
+2025-12-05 14:52:15 - Backup Location: C:\Users\v1\Desktop\DeM Tool project\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup_20251205_145215
+2025-12-05 14:52:15 - Detected OS: Microsoft Windows 11 Pro (Build: 26200)
+2025-12-05 14:52:15 - System is compatible with Windows Autopatch
+2025-12-05 14:52:16 - Backup directory created: C:\Users\v1\Desktop\DeM Tool project\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup_20251205_145215
+2025-12-05 14:52:16 - Processing 16 registry artifacts...
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-05 14:52:16 - Skipping conditional removal: Telemetry Collection Policy (if set to 0)
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired
+2025-12-05 14:52:16 - Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-05 14:52:16 - Skipping conditional removal: Delivery Optimization Mode Override
+2025-12-05 14:52:16 - Validating core Windows Update services...
+2025-12-05 14:52:16 - Core service 'wuauserv' is healthy (Status: Running, StartType: Manual)
+2025-12-05 14:52:16 - Core service 'bits' is healthy (Status: Running, StartType: Automatic)
+2025-12-05 14:52:16 - Core service 'cryptsvc' is healthy (Status: Running, StartType: Automatic)
+2025-12-05 14:52:16 - Core service 'msiserver' is healthy (Status: Stopped, StartType: Manual)
+2025-12-05 14:52:16 - ==============================================
+2025-12-05 14:52:16 - Registry Cleanup Completed!
+2025-12-05 14:52:16 - ==============================================
+2025-12-05 14:52:16 - Total artifacts processed: 16
+2025-12-05 14:52:16 - Artifacts removed: 0
+2025-12-05 14:52:16 - Artifacts skipped: 16
+2025-12-05 14:52:16 - 
+2025-12-05 14:52:16 - Log file saved to: C:\Users\v1\Desktop\DeM Tool project\15127_Remove legacy registry artifacts blocking Autopatch\15127_Remove legacy registry artifacts blocking AutopatchLog.txt
+2025-12-05 14:52:16 - ==============================================
+2025-12-05 14:52:16 - Next Steps for Autopatch Enablement:
+2025-12-05 14:52:16 - ==============================================
+2025-12-05 14:52:16 - 1. Verify Windows Update service is running
+2025-12-05 14:52:16 - 2. Check Group Policy configuration
+2025-12-05 14:52:16 - 3. Ensure device meets Autopatch requirements
+2025-12-05 14:52:16 - 4. Monitor Windows Update functionality
+2025-12-05 14:52:16 - ==============================================
+2025-12-05 14:52:16 - STATUS: CLEAN - No artifacts found to remove
+2025-12-05 14:52:16 - REBOOT: Not required
+2025-12-05 14:52:16 - ==============================================
