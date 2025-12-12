@@ -1,0 +1,112 @@
+================================================================================
+[2025-12-12 09:52:30] [INFO] Starting 22624_Windows_power_plan_set_power_plan_to_Energy_saver v1.0
+[2025-12-12 09:52:30] [INFO] Execution Time: 2025-12-12 09:52:30
+[2025-12-12 09:52:30] [INFO] Computer: MUMONPREM037
+[2025-12-12 09:52:30] [INFO] User: v1
+================================================================================
+[2025-12-12 09:52:30] [INFO] STEP 1: Checking Prerequisites
+[2025-12-12 09:52:30] [INFO] Checking prerequisites...
+[2025-12-12 09:52:30] [INFO] PowerShell version: 5.1.26100.7019 - OK
+[2025-12-12 09:52:30] [SUCCESS] Administrator privileges confirmed - OK
+[2025-12-12 09:52:31] [INFO] PowerCfg utility is available - OK
+================================================================================
+[2025-12-12 09:52:31] [INFO] STEP 2: Getting Current Power Plan Information
+[2025-12-12 09:52:31] [INFO] Retrieving current power plan...
+[2025-12-12 09:52:32] [INFO] Current active power plan: Power saver (GUID: a1841308-3541-4fab-bc81-f71556f20b4a)
+[2025-12-12 09:52:32] [SUCCESS] System is already using Energy Saver power plan - no change needed
+================================================================================
+[2025-12-12 09:52:32] [INFO] Saving execution results...
+[2025-12-12 09:52:32] [INFO] Results saved to: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saver-Results.json
+================================================================================
+[2025-12-12 09:52:32] [INFO] Script execution completed
+[2025-12-12 09:52:32] [INFO] Log file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saverLog.txt
+[2025-12-12 09:52:32] [INFO] Results file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saver-Results.json
+================================================================================
+================================================================================
+[2025-12-12 09:54:53] [INFO] Starting 22624_Windows_power_plan_set_power_plan_to_Energy_saver v1.0
+[2025-12-12 09:54:53] [INFO] Execution Time: 2025-12-12 09:54:53
+[2025-12-12 09:54:53] [INFO] Computer: MUMONPREM037
+[2025-12-12 09:54:53] [INFO] User: v1
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 1: Checking Prerequisites
+[2025-12-12 09:54:53] [INFO] Checking prerequisites...
+[2025-12-12 09:54:53] [INFO] PowerShell version: 5.1.26100.7019 - OK
+[2025-12-12 09:54:53] [SUCCESS] Administrator privileges confirmed - OK
+[2025-12-12 09:54:53] [INFO] PowerCfg utility is available - OK
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 2: Getting Current Power Plan Information
+[2025-12-12 09:54:53] [INFO] Retrieving current power plan...
+[2025-12-12 09:54:53] [INFO] Current active power plan: Balanced (GUID: 381b4222-f694-41f0-9685-ff5bb260df2e)
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 3: Listing Available Power Plans
+[2025-12-12 09:54:53] [INFO] Retrieving available power plans...
+[2025-12-12 09:54:53] [INFO]   - Balanced (GUID: 381b4222-f694-41f0-9685-ff5bb260df2e) (Active)
+[2025-12-12 09:54:53] [INFO]   - High performance (GUID: 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c) 
+[2025-12-12 09:54:53] [INFO]   - Power saver (GUID: a1841308-3541-4fab-bc81-f71556f20b4a) 
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 4: Verifying Energy Saver Plan Availability
+[2025-12-12 09:54:53] [INFO] Checking if Energy Saver power plan exists...
+[2025-12-12 09:54:53] [SUCCESS] Energy Saver power plan found: Power saver
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 5: Creating Backup of Current Settings
+[2025-12-12 09:54:53] [INFO] Creating backup of current power plan settings...
+[2025-12-12 09:54:53] [INFO] Backup directory created: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\PowerPlanBackup_20251212_095453
+[2025-12-12 09:54:53] [SUCCESS] Backup file created: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\PowerPlanBackup_20251212_095453\PowerPlan_Backup.json
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 6: Applying Energy Saver Power Plan
+[2025-12-12 09:54:53] [INFO] Attempting to set power plan to Energy Saver...
+[2025-12-12 09:54:53] [SUCCESS] Successfully set power plan to Energy Saver
+================================================================================
+[2025-12-12 09:54:53] [INFO] STEP 7: Validating Power Plan Change
+[2025-12-12 09:54:53] [INFO] Validating power plan change...
+[2025-12-12 09:54:55] [INFO] Retrieving current power plan...
+[2025-12-12 09:54:56] [INFO] Current active power plan: Power saver (GUID: a1841308-3541-4fab-bc81-f71556f20b4a)
+[2025-12-12 09:54:56] [SUCCESS] Validation successful - Energy Saver plan is now active
+================================================================================
+[2025-12-12 09:54:56] [SUCCESS] Power plan successfully changed to Energy Saver
+================================================================================
+[2025-12-12 09:54:56] [INFO] Saving execution results...
+[2025-12-12 09:54:56] [INFO] Results saved to: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saver-Results.json
+================================================================================
+[2025-12-12 09:54:56] [INFO] Script execution completed
+[2025-12-12 09:54:56] [INFO] Log file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saverLog.txt
+[2025-12-12 09:54:56] [INFO] Results file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saver-Results.json
+[2025-12-12 09:54:56] [INFO] Backup location: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\PowerPlanBackup_20251212_095453
+[2025-12-12 09:54:56] [INFO] Backup file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\PowerPlanBackup_20251212_095453\PowerPlan_Backup.json
+================================================================================
+================================================================================
+[2025-12-12 11:32:05] [INFO] Starting 22624_Windows_power_plan_set_power_plan_to_Energy_saver v1.0
+[2025-12-12 11:32:05] [INFO] Execution Time: 2025-12-12 11:32:05
+[2025-12-12 11:32:05] [INFO] Computer: MUMONPREM037
+[2025-12-12 11:32:05] [INFO] User: v1
+================================================================================
+[2025-12-12 11:32:05] [INFO] STEP 1: Checking Prerequisites
+[2025-12-12 11:32:05] [INFO] Checking prerequisites...
+[2025-12-12 11:32:06] [INFO] PowerShell version: 5.1.26100.7019 - OK
+[2025-12-12 11:32:06] [ERROR] Administrator privileges are required to change power plans
+[2025-12-12 11:32:06] [INFO] PowerCfg utility is available - OK
+[2025-12-12 11:32:06] [ERROR] Script execution failed: Prerequisites check failed. Cannot proceed.
+================================================================================
+[2025-12-12 11:32:06] [INFO] Script execution completed
+[2025-12-12 11:32:06] [INFO] Log file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saverLog.txt
+================================================================================
+================================================================================
+[2025-12-12 11:46:04] [INFO] Starting 22624_Windows_power_plan_set_power_plan_to_Energy_saver v1.0
+[2025-12-12 11:46:04] [INFO] Execution Time: 2025-12-12 11:46:04
+[2025-12-12 11:46:04] [INFO] Computer: MUMONPREM037
+[2025-12-12 11:46:04] [INFO] User: v1
+================================================================================
+[2025-12-12 11:46:04] [INFO] STEP 1: Checking Prerequisites
+[2025-12-12 11:46:04] [INFO] Checking prerequisites...
+[2025-12-12 11:46:04] [INFO] PowerShell version: 5.1.26100.7019 - OK
+[2025-12-12 11:46:04] [SUCCESS] Administrator privileges confirmed - OK
+[2025-12-12 11:46:04] [INFO] PowerCfg utility is available - OK
+================================================================================
+[2025-12-12 11:46:04] [INFO] STEP 2: Getting Current Power Plan Information
+[2025-12-12 11:46:04] [INFO] Retrieving current power plan...
+[2025-12-12 11:46:04] [INFO] Current active power plan: Power saver (GUID: a1841308-3541-4fab-bc81-f71556f20b4a)
+[2025-12-12 11:46:04] [SUCCESS] System is already using Energy Saver power plan - no change needed
+================================================================================
+[2025-12-12 11:46:04] [INFO] Script execution completed
+[2025-12-12 11:46:04] [INFO] Log file: C:\Users\v1\Desktop\DeM Tool project\22624_Windows_power_plan_set_power_plan_to_Energy_saver\22624_Windows_power_plan_set_power_plan_to_Energy_saverLog.txt
+================================================================================
