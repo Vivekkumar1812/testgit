@@ -54,3 +54,217 @@
 2025-12-05 14:52:16 - STATUS: CLEAN - No artifacts found to remove
 2025-12-05 14:52:16 - REBOOT: Not required
 2025-12-05 14:52:16 - ==============================================
+
+2025-12-24 17:29:52 - [INFO] ============================================== SCRIPT EXECUTION START ==============================================
+2025-12-24 17:29:52 - [INFO] Script: 15127_Remove legacy registry artifacts blocking Autopatch.ps1 | Version: 1.2 | Start Time: 2025-12-24 17:29:52
+2025-12-24 17:29:52 - [INFO] =========================================================================================================
+
+2025-12-24 17:29:52 - [INFO] Administrator privileges confirmed.
+2025-12-24 17:29:52 - [INFO] ==============================================
+2025-12-24 17:29:52 - [INFO] Windows Autopatch Registry Cleanup - SYSTRAC
+2025-12-24 17:29:52 - [INFO] ==============================================
+2025-12-24 17:29:52 - [INFO] Script Version: 1.2
+2025-12-24 17:29:52 - [INFO] Execution Time: 12/24/2025 17:29:52
+2025-12-24 17:29:52 - [INFO] Computer Name: MUMONPREM037
+2025-12-24 17:29:52 - [INFO] User Context: v1
+2025-12-24 17:29:52 - [INFO] Domain: CORP
+2025-12-24 17:29:52 - [INFO] Backup Enabled: YES (Automatic)
+2025-12-24 17:29:52 - [INFO] Backup Location: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup_20251224_172952
+2025-12-24 17:29:53 - [INFO] Detected OS: Microsoft Windows 11 Pro (Build: 26200)
+2025-12-24 17:29:53 - [INFO] System is compatible with Windows Autopatch
+2025-12-24 17:29:53 - [WARNING] System is domain-joined - policies may be GPO-managed
+2025-12-24 17:29:53 - [WARNING] System appears to be MDM-enrolled - policies may be centrally managed
+2025-12-24 17:29:53 - [WARNING] ⚠️ IMPORTANT: Registry changes may be reapplied by GPO/MDM policy refresh
+2025-12-24 17:29:53 - [WARNING]    Coordinate with domain/MDM administrators to update centralized policies
+2025-12-24 17:29:53 - [INFO] Backup directory created: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup_20251224_172952
+2025-12-24 17:29:53 - [INFO] Processing 16 registry artifacts...
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:29:53 - [INFO] Skipping conditional removal: Telemetry Collection Policy (if set to 0)
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:53 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired
+2025-12-24 17:29:54 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:29:54 - [INFO] Skipping conditional removal: Delivery Optimization Mode Override
+2025-12-24 17:29:54 - [INFO] Validating core Windows Update services...
+2025-12-24 17:29:54 - [INFO] Core service 'wuauserv' is running (StartType: Manual)
+2025-12-24 17:29:54 - [INFO] Core service 'bits' is running (StartType: Automatic)
+2025-12-24 17:29:54 - [INFO] Core service 'cryptsvc' is running (StartType: Automatic)
+2025-12-24 17:29:54 - [INFO] Core service 'msiserver' is not running but available (Status: Stopped, StartType: Manual)
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] Registry Cleanup Completed!
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] Total artifacts processed: 16
+2025-12-24 17:29:54 - [INFO] Artifacts removed: 0
+2025-12-24 17:29:54 - [INFO] Artifacts skipped: 16
+
+2025-12-24 17:29:54 - [INFO] Log file saved to: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\15127_Remove legacy registry artifacts blocking AutopatchLog.txt
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] Next Steps for Autopatch Enablement:
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] 1. Verify Windows Update service is running
+2025-12-24 17:29:54 - [INFO] 2. Check Group Policy configuration
+2025-12-24 17:29:54 - [INFO] 3. Ensure device meets Autopatch requirements
+2025-12-24 17:29:54 - [INFO] 4. Monitor Windows Update functionality
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] STATUS: CLEAN - No artifacts found to remove
+2025-12-24 17:29:54 - [INFO] REBOOT: Not required
+2025-12-24 17:29:54 - [WARNING] ⚠️ REMINDER: System is GPO/MDM managed - coordinate with administrators for persistent changes
+2025-12-24 17:29:54 - [INFO] ==============================================
+2025-12-24 17:29:54 - [INFO] Exit Code: 0 (0=Success, 1=No Admin, 2=Partial, 3=Failure)
+
+2025-12-24 17:29:54 - [INFO] ============================================== SCRIPT EXECUTION END ===============================================
+2025-12-24 17:29:54 - [INFO] Script completed at: 2025-12-24 17:29:54 | Exit Code: 0
+2025-12-24 17:29:54 - [INFO] =========================================================================================================
+
+
+2025-12-24 17:43:25 - [INFO] ============================================== SCRIPT EXECUTION START ==============================================
+2025-12-24 17:43:25 - [INFO] Script: 15127_Remove legacy registry artifacts blocking Autopatch.ps1 | Version: 1.2 | Start Time: 2025-12-24 17:43:25
+2025-12-24 17:43:25 - [INFO] =========================================================================================================
+
+2025-12-24 17:43:25 - [INFO] Administrator privileges confirmed.
+2025-12-24 17:43:25 - [INFO] ==============================================
+2025-12-24 17:43:25 - [INFO] Windows Autopatch Registry Cleanup
+2025-12-24 17:43:25 - [INFO] ==============================================
+2025-12-24 17:43:25 - [INFO] Script Version: 1.2
+2025-12-24 17:43:25 - [INFO] Execution Time: 12/24/2025 17:43:25
+2025-12-24 17:43:25 - [INFO] Computer Name: MUMONPREM037
+2025-12-24 17:43:25 - [INFO] User Context: v1
+2025-12-24 17:43:25 - [INFO] Domain: CORP
+2025-12-24 17:43:25 - [INFO] Backup Enabled: YES (Automatic)
+2025-12-24 17:43:25 - [INFO] Backup Location: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup\Backup_20251224_174325
+2025-12-24 17:43:26 - [INFO] Detected OS: Microsoft Windows 11 Pro (Build: 26200)
+2025-12-24 17:43:26 - [INFO] System is compatible with Windows Autopatch
+2025-12-24 17:43:26 - [WARNING] System is domain-joined - policies may be GPO-managed
+2025-12-24 17:43:26 - [WARNING] System appears to be MDM-enrolled - policies may be centrally managed
+2025-12-24 17:43:26 - [WARNING] ⚠️ IMPORTANT: Registry changes may be reapplied by GPO/MDM policy refresh
+2025-12-24 17:43:26 - [WARNING]    Coordinate with domain/MDM administrators to update centralized policies
+2025-12-24 17:43:26 - [INFO] Created RegistryBackup root folder: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup
+2025-12-24 17:43:26 - [INFO] Backup directory ready: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup\Backup_20251224_174325
+2025-12-24 17:43:26 - [INFO] Processing 16 registry artifacts...
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:43:26 - [INFO] Skipping conditional removal: Telemetry Collection Policy (if set to 0)
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired
+2025-12-24 17:43:26 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:43:26 - [INFO] Skipping conditional removal: Delivery Optimization Mode Override
+2025-12-24 17:43:26 - [INFO] Validating core Windows Update services...
+2025-12-24 17:43:26 - [INFO] Core service 'wuauserv' is not running but available (Status: Stopped, StartType: Manual)
+2025-12-24 17:43:26 - [INFO] Core service 'bits' is running (StartType: Automatic)
+2025-12-24 17:43:26 - [INFO] Core service 'cryptsvc' is running (StartType: Automatic)
+2025-12-24 17:43:26 - [INFO] Core service 'msiserver' is not running but available (Status: Stopped, StartType: Manual)
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] Registry Cleanup Completed!
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] Total artifacts processed: 16
+2025-12-24 17:43:26 - [INFO] Artifacts removed: 0
+2025-12-24 17:43:26 - [INFO] Artifacts skipped: 16
+
+2025-12-24 17:43:26 - [INFO] Log file saved to: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\15127_Remove legacy registry artifacts blocking AutopatchLog.txt
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] Next Steps for Autopatch Enablement:
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] 1. Verify Windows Update service is running
+2025-12-24 17:43:26 - [INFO] 2. Check Group Policy configuration
+2025-12-24 17:43:26 - [INFO] 3. Ensure device meets Autopatch requirements
+2025-12-24 17:43:26 - [INFO] 4. Monitor Windows Update functionality
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] STATUS: CLEAN - No artifacts found to remove
+2025-12-24 17:43:26 - [INFO] REBOOT: Not required
+2025-12-24 17:43:26 - [WARNING] ⚠️ REMINDER: System is GPO/MDM managed - coordinate with administrators for persistent changes
+2025-12-24 17:43:26 - [INFO] ==============================================
+2025-12-24 17:43:26 - [INFO] Exit Code: 0 (0=Success, 1=No Admin, 2=Partial, 3=Failure)
+
+2025-12-24 17:43:26 - [INFO] ============================================== SCRIPT EXECUTION END ===============================================
+2025-12-24 17:43:26 - [INFO] Script completed at: 2025-12-24 17:43:26 | Exit Code: 0
+2025-12-24 17:43:26 - [INFO] =========================================================================================================
+
+
+2025-12-24 17:46:41 - [INFO] ============================================== SCRIPT EXECUTION START ==============================================
+2025-12-24 17:46:41 - [INFO] Script: 15127_Remove legacy registry artifacts blocking Autopatch.ps1 | Version: 1.2 | Start Time: 2025-12-24 17:46:41
+2025-12-24 17:46:41 - [INFO] =========================================================================================================
+
+2025-12-24 17:46:41 - [INFO] Administrator privileges confirmed.
+2025-12-24 17:46:41 - [INFO] ==============================================
+2025-12-24 17:46:41 - [INFO] Windows Autopatch Registry Cleanup
+2025-12-24 17:46:41 - [INFO] ==============================================
+2025-12-24 17:46:41 - [INFO] Script Version: 1.2
+2025-12-24 17:46:41 - [INFO] Execution Time: 12/24/2025 17:46:41
+2025-12-24 17:46:41 - [INFO] Computer Name: MUMONPREM037
+2025-12-24 17:46:41 - [INFO] User Context: v1
+2025-12-24 17:46:41 - [INFO] Domain: CORP
+2025-12-24 17:46:41 - [INFO] Backup Enabled: YES (Automatic)
+2025-12-24 17:46:41 - [INFO] Backup Location: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup\Backup_20251224_174641
+2025-12-24 17:46:42 - [INFO] Detected OS: Microsoft Windows 11 Pro (Build: 26200)
+2025-12-24 17:46:42 - [INFO] System is compatible with Windows Autopatch
+2025-12-24 17:46:42 - [WARNING] System is domain-joined - policies may be GPO-managed
+2025-12-24 17:46:42 - [WARNING] System appears to be MDM-enrolled - policies may be centrally managed
+2025-12-24 17:46:42 - [WARNING] ⚠️ IMPORTANT: Registry changes may be reapplied by GPO/MDM policy refresh
+2025-12-24 17:46:42 - [WARNING]    Coordinate with domain/MDM administrators to update centralized policies
+2025-12-24 17:46:42 - [INFO] Backup directory ready: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\RegistryBackup\Backup_20251224_174641
+2025-12-24 17:46:42 - [INFO] Processing 16 registry artifacts...
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU
+2025-12-24 17:46:42 - [INFO] Skipping conditional removal: Telemetry Collection Policy (if set to 0)
+2025-12-24 17:46:42 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:43 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired
+2025-12-24 17:46:43 - [INFO] Registry key not found (already clean): HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate
+2025-12-24 17:46:43 - [INFO] Skipping conditional removal: Delivery Optimization Mode Override
+2025-12-24 17:46:43 - [INFO] Validating core Windows Update services...
+2025-12-24 17:46:43 - [INFO] Core service 'wuauserv' is not running but available (Status: Stopped, StartType: Manual)
+2025-12-24 17:46:43 - [INFO] Core service 'bits' is running (StartType: Automatic)
+2025-12-24 17:46:43 - [INFO] Core service 'cryptsvc' is running (StartType: Automatic)
+2025-12-24 17:46:43 - [INFO] Core service 'msiserver' is not running but available (Status: Stopped, StartType: Manual)
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] Registry Cleanup Completed!
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] Total artifacts processed: 16
+2025-12-24 17:46:43 - [INFO] Artifacts removed: 0
+2025-12-24 17:46:43 - [INFO] Artifacts skipped: 16
+
+2025-12-24 17:46:43 - [INFO] Log file saved to: C:\Users\v1\Desktop\testgit-1\15127_Remove legacy registry artifacts blocking Autopatch\15127_Remove legacy registry artifacts blocking AutopatchLog.txt
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] Next Steps for Autopatch Enablement:
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] 1. Verify Windows Update service is running
+2025-12-24 17:46:43 - [INFO] 2. Check Group Policy configuration
+2025-12-24 17:46:43 - [INFO] 3. Ensure device meets Autopatch requirements
+2025-12-24 17:46:43 - [INFO] 4. Monitor Windows Update functionality
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] STATUS: CLEAN - No artifacts found to remove
+2025-12-24 17:46:43 - [INFO] REBOOT: Not required
+2025-12-24 17:46:43 - [WARNING] ⚠️ REMINDER: System is GPO/MDM managed - coordinate with administrators for persistent changes
+2025-12-24 17:46:43 - [INFO] ==============================================
+2025-12-24 17:46:43 - [INFO] Exit Code: 0 (0=Success, 1=No Admin, 2=Partial, 3=Failure)
+
+2025-12-24 17:46:43 - [INFO] ============================================== SCRIPT EXECUTION END ===============================================
+2025-12-24 17:46:43 - [INFO] Script completed at: 2025-12-24 17:46:43 | Exit Code: 0
+2025-12-24 17:46:43 - [INFO] =========================================================================================================
+

@@ -6,9 +6,11 @@ AUTHOR & EMAIL          Vivek: vivek.f.vivek@capgemini.com
 COMPANY                 Capgemini
 TAGS                    Windows Update, Autopatch, Registry, WSUS, GPO, Remediation
 STATUS                  Draft
-DATE OF CHANGES         December 4, 2025
-VERSION                 1.1
-RELEASENOTES            Version 1.1: SYSTRAC-optimized with silent execution, enhanced logging, detailed artifact tracking
+DATE OF CHANGES         December 24, 2025
+VERSION                 1.2
+RELEASENOTES            Version 1.2: Fixed critical logging bug, added GPO/MDM detection, meaningful exit codes (0/1/2/3), 
+                        optional -ForceNoBackup parameter, improved service validation, enhanced error handling
+                        Version 1.1: SYSTRAC-optimized with silent execution, enhanced logging, detailed artifact tracking
 APPROVED                Yes
 SUPPORT                 NA
 DEX TOOLS               NA
@@ -30,11 +32,16 @@ DESCRIPTION             This script identifies, optionally backs up, and removes
                         
 INPUTS                  -VerboseLogging (Optional): Switch to enable additional verbose logging output
                                                     Default: $false
+                        -ForceNoBackup (Optional): Force execution without creating registry backups (not recommended)
+                                                   Default: $false
+                                                   Use only when backup path issues prevent execution
                         -WhatIf (Built-in): Preview all changes without executing them (dry run)
                         -Confirm (Built-in): Prompt for confirmation before each registry modification
                         
                         Note: Registry backups are automatically created in script directory
-                        Backup folder format: RegistryBackup_yyyyMMdd_HHmmss
+                        Root backup folder: RegistryBackup (persistent, created once)
+                        Session backup subfolder format: Backup_yyyyMMdd_HHmmss (created per execution)
+                        Full path example: .\RegistryBackup\Backup_20251224_172250\
                         
                         Target registry paths:
                             - HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate (WSUS and Update policies)
@@ -45,14 +52,17 @@ INPUTS                  -VerboseLogging (Optional): Switch to enable additional 
 OUTPUTS                 Log file with all operations:
                             - Computer name, user context, domain information
                             - System compatibility check (Windows 10/11 detection)
+                            - GPO/MDM management detection and warnings
                             - Registry artifact processing status (removed/skipped)
                             - Detailed list of removed artifacts with paths and values
                             - Windows Update service validation results
                             - Final execution summary with STATUS and REBOOT requirements
-                            - Exit codes: 0 (Success), 1 (Failure - Admin required)
+                            - Exit codes: 0 (Success/Clean), 1 (No Admin Rights), 2 (Partial/Issues), 3 (Failure)
                             
-VARIABLE DESCRIPTION    $CreateBackup = Automatically set to $true (backups always enabled)
-                        $BackupPath = Automatically generated path in script directory
+VARIABLE DESCRIPTION    $CreateBackup = Automatically set based on -ForceNoBackup parameter (default: enabled)
+                        $BackupRootFolder = Root folder for all registry backups (RegistryBackup)
+                        $BackupSessionFolder = Timestamped subfolder name for current execution
+                        $BackupPath = Full path to current session's backup folder
                         $VerboseLogging = Switch parameter to enable detailed logging
                         $ScriptName = Stores the name of the script file without extension
                         $ScriptPath = Stores the directory path where the script is located
@@ -69,15 +79,19 @@ EXAMPLE                 PowerShell (.ps1) Usage:
                         & ".\15127_Remove legacy registry artifacts blocking Autopatch.ps1"
                         & ".\15127_Remove legacy registry artifacts blocking Autopatch.ps1" -WhatIf
                         & ".\15127_Remove legacy registry artifacts blocking Autopatch.ps1" -Verbose
+                        & ".\15127_Remove legacy registry artifacts blocking Autopatch.ps1" -ForceNoBackup
                         
                         SYSTRAC Command:
                         PowerShell.exe -NoProfile -ExecutionPolicy Bypass -File ".\15127_Remove legacy registry artifacts blocking Autopatch.ps1"
                         
                         Expected Output:
-                        - Exit Code 0: Success (artifacts removed or system already clean)
+                        - Exit Code 0: Success (artifacts removed) or Clean (no artifacts found)
                         - Exit Code 1: Failure (missing admin privileges)
-                        - Log file: STATUS line indicates SUCCESS/CLEAN/PARTIAL
+                        - Exit Code 2: Partial (some issues encountered, review log)
+                        - Exit Code 3: Failure (unable to process artifacts)
+                        - Log file: STATUS line indicates SUCCESS/CLEAN/PARTIAL/FAILURE
                         - Log file: REBOOT line indicates if restart required
+                        - Log file: GPO/MDM warnings if centrally managed
                         
 LOGIC DOCUMENT          Workflow:
                         1. Validate administrator privileges (exit if not admin)
@@ -99,7 +113,10 @@ LOGIC DOCUMENT          Workflow:
 [CmdletBinding(SupportsShouldProcess)]
 param(
     [Parameter(HelpMessage = "Enable verbose logging")]
-    [switch]$VerboseLogging = $false
+    [switch]$VerboseLogging = $false,
+    
+    [Parameter(HelpMessage = "Force execution without creating registry backups (not recommended)")]
+    [switch]$ForceNoBackup = $false
 )
 
 $ScriptName = & {$MyInvocation.ScriptName}
@@ -110,19 +127,40 @@ $ScriptName = $ScriptName -replace ".ps1",""
 # Writing log file path
 $logFile = "$ScriptPath\$ScriptName"+"Log.txt"
 
-# Automatic backup configuration - always enabled, stored in script directory
-$CreateBackup = $true
-$BackupPath = Join-Path $ScriptPath "RegistryBackup_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+# Automatic backup configuration - enabled by default unless -ForceNoBackup specified
+$CreateBackup = -not $ForceNoBackup
+$BackupRootFolder = Join-Path $ScriptPath "RegistryBackup"
+$BackupSessionFolder = "Backup_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
+$BackupPath = Join-Path $BackupRootFolder $BackupSessionFolder
 
 #Log function to write messages to log file
 function LogMessage {
     param (
-        [string]$message
+        [Parameter(Mandatory=$false)]
+        [AllowEmptyString()]
+        [string]$message = "",
+        
+        [Parameter(Mandatory=$false)]
+        [ValidateSet('INFO', 'WARNING', 'ERROR', 'SUCCESS')]
+        [string]$Level = 'INFO'
     )
-    $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $logMessage = "$timestamp - $message"
-    Add-Content -Path $logFile -Value $logMessage
+    
+    # Handle empty messages (for blank lines in log)
+    if ([string]::IsNullOrWhiteSpace($message)) {
+        Add-Content -Path $logFile -Value ""
+    } else {
+        $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+        $logMessage = "$timestamp - [$Level] $message"
+        Add-Content -Path $logFile -Value $logMessage
+    }
 }
+
+# Script execution start marker
+LogMessage ""
+LogMessage "============================================== SCRIPT EXECUTION START ==============================================" -Level 'INFO'
+LogMessage "Script: 15127_Remove legacy registry artifacts blocking Autopatch.ps1 | Version: 1.2 | Start Time: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -Level 'INFO'
+LogMessage "=========================================================================================================" -Level 'INFO'
+LogMessage ""
 
 # Check if running as administrator
 try {
@@ -220,8 +258,13 @@ function Remove-RegistryKey {
         if ($CreateBackup) {
             $BackupSuccess = Backup-RegistryKey -KeyPath $KeyPath -BackupPath $BackupPath
             if (-not $BackupSuccess) {
-                LogMessage "Skipping removal due to backup failure: $KeyPath"
-                return "BackupFailed"
+                LogMessage "Backup failed for: $KeyPath" -Level 'WARNING'
+                if (-not $ForceNoBackup) {
+                    LogMessage "Skipping removal due to backup failure (use -ForceNoBackup to override)" -Level 'WARNING'
+                    return "BackupFailed"
+                } else {
+                    LogMessage "Proceeding with removal despite backup failure (-ForceNoBackup enabled)" -Level 'WARNING'
+                }
             }
         }
         
@@ -281,6 +324,43 @@ function Test-AutopatchEligibility {
         return $true
     } else {
         LogMessage "System may not be compatible with Windows Autopatch"
+        return $false
+    }
+}
+
+function Test-GPOManagedPolicies {
+    <#
+    .SYNOPSIS
+        Detects if Windows Update policies are managed by Group Policy or MDM
+    #>
+    try {
+        $IsDomainJoined = (Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain
+        $GPOManaged = $false
+        
+        if ($IsDomainJoined) {
+            LogMessage "System is domain-joined - policies may be GPO-managed" -Level 'WARNING'
+            $GPOManaged = $true
+        }
+        
+        # Check for MDM enrollment
+        $MDMPath = "HKLM:\SOFTWARE\Microsoft\Enrollments"
+        if (Test-Path $MDMPath) {
+            $Enrollments = Get-ChildItem $MDMPath -ErrorAction SilentlyContinue
+            if ($Enrollments) {
+                LogMessage "System appears to be MDM-enrolled - policies may be centrally managed" -Level 'WARNING'
+                $GPOManaged = $true
+            }
+        }
+        
+        if ($GPOManaged) {
+            LogMessage "⚠️ IMPORTANT: Registry changes may be reapplied by GPO/MDM policy refresh" -Level 'WARNING'
+            LogMessage "   Coordinate with domain/MDM administrators to update centralized policies" -Level 'WARNING'
+        }
+        
+        return $GPOManaged
+    }
+    catch {
+        LogMessage "Could not determine GPO/MDM management status: $($_.Exception.Message)" -Level 'WARNING'
         return $false
     }
 }
@@ -390,20 +470,25 @@ $RegistryArtifacts = @(
 
 # Main execution
 LogMessage "=============================================="
-LogMessage "Windows Autopatch Registry Cleanup - SYSTRAC"
+LogMessage "Windows Autopatch Registry Cleanup"
 LogMessage "=============================================="
-LogMessage "Script Version: 1.1"
-LogMessage "Execution Time: $(Get-Date)"
-LogMessage "Computer Name: $env:COMPUTERNAME"
-LogMessage "User Context: $env:USERNAME"
-LogMessage "Domain: $env:USERDOMAIN"
-LogMessage "Backup Enabled: YES (Automatic)"
-LogMessage "Backup Location: $BackupPath"
+LogMessage "Script Version: 1.2" -Level 'INFO'
+LogMessage "Execution Time: $(Get-Date)" -Level 'INFO'
+LogMessage "Computer Name: $env:COMPUTERNAME" -Level 'INFO'
+LogMessage "User Context: $env:USERNAME" -Level 'INFO'
+LogMessage "Domain: $env:USERDOMAIN" -Level 'INFO'
+LogMessage "Backup Enabled: $(if ($CreateBackup) { 'YES (Automatic)' } else { 'NO (-ForceNoBackup specified)' })" -Level 'INFO'
+if ($CreateBackup) {
+    LogMessage "Backup Location: $BackupPath" -Level 'INFO'
+}
 
 # Check system eligibility
 if (-not (Test-AutopatchEligibility)) {
-    LogMessage "System may not support Autopatch. Continuing with cleanup..."
+    LogMessage "System may not support Autopatch. Continuing with cleanup..." -Level 'WARNING'
 }
+
+# Check for GPO/MDM management
+$IsGPOManaged = Test-GPOManagedPolicies
 
 # Verify administrator privileges
 if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
@@ -412,15 +497,31 @@ if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 }
 
 # Create backup directory if needed
-try {
-    if (-not (Test-Path $BackupPath)) {
-        New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
+if ($CreateBackup) {
+    try {
+        # Ensure root backup folder exists
+        if (-not (Test-Path $BackupRootFolder)) {
+            New-Item -Path $BackupRootFolder -ItemType Directory -Force | Out-Null
+            LogMessage "Created RegistryBackup root folder: $BackupRootFolder" -Level 'INFO'
+        }
+        
+        # Create session-specific backup folder
+        if (-not (Test-Path $BackupPath)) {
+            New-Item -Path $BackupPath -ItemType Directory -Force | Out-Null
+        }
+        LogMessage "Backup directory ready: $BackupPath" -Level 'INFO'
+    } catch {
+        LogMessage "Failed to create backup directory: $($_.Exception.Message)" -Level 'ERROR'
+        if (-not $ForceNoBackup) {
+            LogMessage "ERROR: Cannot proceed without backup capability. Use -ForceNoBackup to override (not recommended)" -Level 'ERROR'
+            exit 3
+        } else {
+            LogMessage "WARNING: Continuing without backup capability (-ForceNoBackup enabled)" -Level 'WARNING'
+            $CreateBackup = $false
+        }
     }
-    LogMessage "Backup directory created: $BackupPath"
-} catch {
-    LogMessage "Failed to create backup directory: $($_.Exception.Message)"
-    LogMessage "WARNING: Continuing without backup capability" -Level 'WARNING'
-    $CreateBackup = $false
+} else {
+    LogMessage "WARNING: Backups disabled via -ForceNoBackup parameter" -Level 'WARNING'
 }
 
 $TotalArtifacts = $RegistryArtifacts.Count
@@ -487,7 +588,7 @@ foreach ($Artifact in $RegistryArtifacts) {
 Write-Progress -Activity "Cleaning Registry Artifacts" -Completed
 
 # Validate core update services
-LogMessage "Validating core Windows Update services..."
+LogMessage "Validating core Windows Update services..." -Level 'INFO'
 
 $CoreServices = @(
     'wuauserv',    # Windows Update
@@ -496,17 +597,22 @@ $CoreServices = @(
     'msiserver'    # Windows Installer
 )
 
+$ServiceIssues = 0
 foreach ($ServiceName in $CoreServices) {
     try {
         $Service = Get-Service -Name $ServiceName -ErrorAction Stop
-        if ($Service.Status -eq 'Running' -or $Service.StartType -ne 'Disabled') {
-            LogMessage "Core service '$ServiceName' is healthy (Status: $($Service.Status), StartType: $($Service.StartType))"
+        if ($Service.Status -eq 'Running') {
+            LogMessage "Core service '$ServiceName' is running (StartType: $($Service.StartType))" -Level 'INFO'
+        } elseif ($Service.StartType -eq 'Disabled') {
+            LogMessage "Core service '$ServiceName' is DISABLED - may impact Windows Update functionality" -Level 'WARNING'
+            $ServiceIssues++
         } else {
-            LogMessage "Core service '$ServiceName' may need attention (Status: $($Service.Status), StartType: $($Service.StartType))"
+            LogMessage "Core service '$ServiceName' is not running but available (Status: $($Service.Status), StartType: $($Service.StartType))" -Level 'INFO'
         }
     }
     catch {
-        LogMessage "Could not validate service '$ServiceName': $($_.Exception.Message)"
+        LogMessage "Could not validate service '$ServiceName': $($_.Exception.Message)" -Level 'WARNING'
+        $ServiceIssues++
     }
 }
 
@@ -560,16 +666,53 @@ if ($RemovedArtifacts -gt 0) {
 
 # SYSTRAC-friendly exit with status
 LogMessage "=============================================="
-if ($RemovedArtifacts -gt 0) {
-    LogMessage "STATUS: SUCCESS - $RemovedArtifacts artifacts removed"
-    LogMessage "REBOOT: Required to apply registry changes"
-} elseif ($SkippedArtifacts -eq $TotalArtifacts) {
-    LogMessage "STATUS: CLEAN - No artifacts found to remove"
-    LogMessage "REBOOT: Not required"
-} else {
-    LogMessage "STATUS: PARTIAL - Some artifacts processed"
-    LogMessage "REBOOT: Review log file for details"
-}
-LogMessage "=============================================="
 
-exit 0
+# Determine exit code and status
+$ExitCode = 0
+$StatusMessage = ""
+$RebootMessage = ""
+
+if ($RemovedArtifacts -gt 0) {
+    $StatusMessage = "STATUS: SUCCESS - $RemovedArtifacts artifacts removed"
+    $RebootMessage = "REBOOT: Required to apply registry changes"
+    $ExitCode = 0
+    LogMessage $StatusMessage -Level 'SUCCESS'
+    LogMessage $RebootMessage -Level 'INFO'
+} elseif ($SkippedArtifacts -eq $TotalArtifacts) {
+    $StatusMessage = "STATUS: CLEAN - No artifacts found to remove"
+    $RebootMessage = "REBOOT: Not required"
+    $ExitCode = 0
+    LogMessage $StatusMessage -Level 'INFO'
+    LogMessage $RebootMessage -Level 'INFO'
+} elseif ($ProcessedArtifacts -gt 0 -and $RemovedArtifacts -eq 0) {
+    $StatusMessage = "STATUS: PARTIAL - Artifacts found but none removed (check log for details)"
+    $RebootMessage = "REBOOT: May be required - review log file"
+    $ExitCode = 2
+    LogMessage $StatusMessage -Level 'WARNING'
+    LogMessage $RebootMessage -Level 'WARNING'
+} else {
+    $StatusMessage = "STATUS: FAILURE - Unable to process artifacts"
+    $RebootMessage = "REBOOT: Unknown - review log file"
+    $ExitCode = 3
+    LogMessage $StatusMessage -Level 'ERROR'
+    LogMessage $RebootMessage -Level 'WARNING'
+}
+
+# Add GPO warning if managed
+if ($IsGPOManaged) {
+    LogMessage "⚠️ REMINDER: System is GPO/MDM managed - coordinate with administrators for persistent changes" -Level 'WARNING'
+}
+
+if ($ServiceIssues -gt 0) {
+    LogMessage "⚠️ WARNING: $ServiceIssues service issue(s) detected - review service status above" -Level 'WARNING'
+}
+
+LogMessage "=============================================="
+LogMessage "Exit Code: $ExitCode (0=Success, 1=No Admin, 2=Partial, 3=Failure)" -Level 'INFO'
+LogMessage ""
+LogMessage "============================================== SCRIPT EXECUTION END ===============================================" -Level 'INFO'
+LogMessage "Script completed at: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') | Exit Code: $ExitCode" -Level 'INFO'
+LogMessage "=========================================================================================================" -Level 'INFO'
+LogMessage ""
+
+exit $ExitCode

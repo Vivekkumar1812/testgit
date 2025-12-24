@@ -1,0 +1,65 @@
+Here’s a concise, section-wise summary of your report that you can use directly:
+________________________________________
+Verdict
+•	Likelihood of success: Low-to-moderate due to a critical logging bug; otherwise high in unmanaged environments with admin rights and no active GPO enforcement.
+•	Critical blocker: LogMessage only accepts one parameter, but script calls it with -Level, causing binding errors and halting execution.
+•	Persistence caveat: Domain GPO/MDM will reapply policies; keys likely reappear after refresh.
+________________________________________
+Pros
+•	Automatic .reg backups before removal.
+•	Honors -WhatIf and -Confirm for safe testing.
+•	Conditional removal for telemetry and DO keys only when harmful.
+•	Structured logging with timestamps, context, and artifact details.
+•	Eligibility checks for OS version and core update services.
+________________________________________
+Cons
+•	Logging API mismatch: -Level parameter causes immediate failure.
+•	Exit codes always 0 except admin precheck; poor for automation.
+•	No GPO awareness; deletions may be transient.
+•	Locale assumptions in reg.exe output handling.
+•	Backup failure stalls remediation.
+•	Service checks may mislead (healthy even if stopped).
+________________________________________
+Failure Points
+•	Admin rights required; exits 1 if missing.
+•	Parameter-binding errors stop execution.
+•	Policy reapplication by GPO/MDM.
+•	Locked keys or access denied.
+•	Backup path issues prevent removal.
+•	Service validation noise.
+________________________________________
+Testing Scenarios
+•	Unmanaged baseline: After bug fix, expect SUCCESS with backups and removal.
+•	GPO-managed: Keys reappear post-refresh; expect PARTIAL.
+•	Backup failure: Removal skipped; expect PARTIAL.
+•	Admin vs non-admin: Non-admin exits 1.
+•	Conditional keys: Remove only when value = 0.
+________________________________________
+Metrics
+•	Artifact counts (total, removed, skipped).
+•	Failure counts with paths.
+•	Backup success rate.
+•	Service validation status.
+•	Runtime timestamps.
+________________________________________
+Acceptance Criteria
+•	Admin check enforced.
+•	Logging works without parameter errors.
+•	Backups created before removal.
+•	WSUS/policy artifacts removed or reported.
+•	Dry-run and confirm behave correctly.
+•	Clear status + meaningful exit codes.
+________________________________________
+Recommendations
+•	Fix LogMessage usage or extend signature to accept Level.
+•	Implement meaningful exit codes:
+0=SUCCESS, 2=PARTIAL, 3=FAILURE, 1=Not admin.
+•	Add GPO/MDM detection and log “Managed”.
+•	Warn about reapplication; avoid forced gpupdate.
+•	Allow -ForceNoBackup for resilience.
+•	Improve service validation clarity.
+•	Emit JSON summary for automation ingestion.
+________________________________________
+Final Assessment
+Solid architecture for registry cleanup with backups and safety checks. Logging bug is a showstopper; policy reapplication limits persistence. After fixes and policy-awareness, suitable for pilot Autopatch prep when paired with central GPO/MDM remediation.
+
