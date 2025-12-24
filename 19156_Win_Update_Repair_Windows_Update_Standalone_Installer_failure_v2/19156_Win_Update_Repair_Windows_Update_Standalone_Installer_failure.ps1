@@ -5,7 +5,7 @@ AUTHOR & EMAIL          Vivek: vivek@capgemini.com
 COMPANY                 Capgemini
 TAGS                    Remediation, DISM, SFC, System Repair, Windows 11, Windows Update DLL
 STATUS                  Draft
-DATE OF CHANGES         22 Dec 2025 
+DATE OF CHANGES         24 Dec 2025 
 VERSION                 2.0
 RELEASENOTES            Enterprise-grade Windows repair with 7 core reliability features:
                         ✓ Windows Update Services Management - Auto-starts wuauserv, BITS, TrustedInstaller
@@ -46,27 +46,27 @@ DESCRIPTION             This script performs comprehensive Windows Update repair
                         
                         7 CORE RELIABILITY FEATURES:
                         
-                        1. WINDOWS UPDATE SERVICES MANAGEMENT (Line 776: Start-WindowsUpdateServices)
+                        1. WINDOWS UPDATE SERVICES MANAGEMENT (Line 1227: Start-WindowsUpdateServices)
                            - Auto-starts wuauserv, BITS, TrustedInstaller services
                            - Ensures DISM RestoreHealth can download repair components
                            - Verifies service status before critical operations
                         
-                        2. JSON EXPORT INTEGRATION (Line 848: Export-RepairResultsToJSON)
+                        2. JSON EXPORT INTEGRATION (Line 1302: Export-RepairResultsToJSON)
                            - Exports detailed results to <ScriptName>-Results.json
                            - Includes metadata, timestamps, exit codes, phase durations
                            - Enables automation/monitoring system integration
                         
-                        3. SYSTEM RESTORE POINT PROTECTION (Line 549: New-SystemRestorePoint)
+                        3. SYSTEM RESTORE POINT PROTECTION (Line 663: New-SystemRestorePoint)
                            - Creates restore point BEFORE any repair operations
                            - Provides rollback capability if repairs cause issues
                            - Stored in C:\System Volume Information\ (Windows VSS)
                         
-                        4. NETWORK RETRY LOGIC (Lines 905, 1042: Invoke-DISMCheckHealth, Invoke-DISMRestoreHealth)
+                        4. NETWORK RETRY LOGIC (Lines 1352, 1470: Invoke-DISMCheckHealth, Invoke-DISMRestoreHealth)
                            - 2-attempt retry pattern with 30-second delays
                            - Handles transient network/Windows Update service failures
                            - Restarts Windows Update services between retry attempts
                         
-                        5. CBS.LOG DEEP ANALYSIS (Line 660: Get-CBSLogDetails)
+                        5. CBS.LOG DEEP ANALYSIS (Line 775: Get-CBSLogDetails)
                            - Parses C:\Windows\Logs\CBS\CBS.log (last 5000 lines)
                            - Extracts corrupted file names and repair actions
                            - Provides root cause analysis for failures
@@ -77,10 +77,10 @@ DESCRIPTION             This script performs comprehensive Windows Update repair
                            - Compares before/after to confirm repair effectiveness
                         
                         7. ENHANCED HELPER FUNCTIONS
-                           - Test-InternetConnectivity (Line 359): Validates Windows Update access
-                           - Test-PendingReboot (Line 404): Detects pending system reboots
-                           - Test-DiskSpace (Line 496): Monitors disk space throughout operations
-                           - Format-Duration (Line 341): Human-readable time reporting
+                           - Test-InternetConnectivity (Line 462): Validates Windows Update access
+                           - Test-PendingReboot (Line 508): Detects pending system reboots
+                           - Test-DiskSpace (Line 600): Monitors disk space throughout operations
+                           - Format-Duration (Line 442): Human-readable time reporting
                         
                         MICROSOFT OFFICIAL GUIDANCE:
                         Per KB947821: DISM must run first to repair Component Store,
@@ -127,6 +127,7 @@ FUNCTIONS               WriteLog = Centralized logging function with timestamps
                         Invoke-DISMRestoreHealth = Executes DISM RestoreHealth with 2-attempt retry logic
                         Invoke-SFCRepair = Executes SFC /scannow with detailed result parsing
                         Start-DISMRepair = Main orchestration function coordinating all repair phases
+                        NOTE: Line numbers in this header were updated to match the current file layout (as of 24 Dec 2025). Line numbers may change as the script evolves.
 NOTES                   PREREQUISITES:
                         - Windows 10/11 (Build 10240 or later)
                         - Administrator privileges (mandatory for DISM/SFC)
@@ -159,26 +160,26 @@ LICENSE                 MIT License
 # All parameters have smart defaults for zero-touch execution
 #==================================================================================================
 param(
-    [Parameter(Mandatory=$false, HelpMessage="Path to custom DISM source (e.g., mounted ISO install.wim). If not specified, uses Windows Update.")]
+    [Parameter(Mandatory = $false, HelpMessage = "Path to custom DISM source (e.g., mounted ISO install.wim). If not specified, uses Windows Update.")]
     [ValidateScript({
-        if ($_ -and -not (Test-Path $_)) {
-            throw "DISM source path does not exist: $_"
-        }
-        $true
-    })]
+            if ($_ -and -not (Test-Path $_)) {
+                throw "DISM source path does not exist: $_"
+            }
+            $true
+        })]
     [string]$DISMSource = $null,
     
-    [Parameter(Mandatory=$false, HelpMessage="Prevent DISM from contacting Windows Update (offline mode). Default: false (uses Windows Update).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Prevent DISM from contacting Windows Update (offline mode). Default: false (uses Windows Update).")]
     [switch]$LimitAccess = $false,
     
-    [Parameter(Mandatory=$false, HelpMessage="Skip SFC scan and only run DISM phases. Default: false (runs both DISM and SFC).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Skip SFC scan and only run DISM phases. Default: false (runs both DISM and SFC).")]
     [switch]$SkipSFC = $false,
     
-    [Parameter(Mandatory=$false, HelpMessage="Minimum free disk space in GB required before operations. Default: 2GB.")]
+    [Parameter(Mandatory = $false, HelpMessage = "Minimum free disk space in GB required before operations. Default: 2GB.")]
     [ValidateRange(1, 100)]
     [int]$MinimumDiskSpaceGB = 2,
     
-    [Parameter(Mandatory=$false, HelpMessage="Force execution even if pending reboot is detected. Default: false (warns but continues).")]
+    [Parameter(Mandatory = $false, HelpMessage = "Force execution even if pending reboot is detected. Default: false (warns but continues).")]
     [switch]$IgnorePendingReboot = $false
 )
 
@@ -192,7 +193,7 @@ param(
 $ScriptName = & { $myInvocation.ScriptName }  # Get full path of currently executing script
 $ScriptPath = Split-Path -parent $ScriptName   # Extract directory path
 $ScriptName = Split-Path $ScriptName -Leaf     # Extract filename only
-$scriptNameOnly = $ScriptName -replace '.PS1','' # Remove .PS1 extension
+$scriptNameOnly = $ScriptName -replace '.PS1', '' # Remove .PS1 extension
 $LogFile = "$ScriptPath\$ScriptNameOnly" + "Log.txt" # Construct log file path
 
 ########## Function: Write messages to log file with timestamp ########
@@ -200,8 +201,7 @@ $LogFile = "$ScriptPath\$ScriptNameOnly" + "Log.txt" # Construct log file path
 # Format: yyyy/MM/dd HH:mm:ss <Message>
 # Usage: WriteLog "Your message here"
 ##########################################################################
-function WriteLog    
-{
+function WriteLog {
     Param (
         [string]$LogString  # Message to be logged
     )
@@ -233,42 +233,42 @@ WriteLog "======================================================================
 #==================================================================================================
 $Global:RepairResults = @{
     # DISM Phase Results
-    DISMCheckHealthSuccess = $false      # True if CheckHealth passed
-    DISMScanHealthSuccess = $false       # True if ScanHealth found no corruption
-    DISMRestoreHealthSuccess = $false    # True if RestoreHealth completed successfully
-    RebootRequired = $false              # True if reboot needed to finalize repairs (Exit Code 3010)
+    DISMCheckHealthSuccess     = $false      # True if CheckHealth passed
+    DISMScanHealthSuccess      = $false       # True if ScanHealth found no corruption
+    DISMRestoreHealthSuccess   = $false    # True if RestoreHealth completed successfully
+    RebootRequired             = $false              # True if reboot needed to finalize repairs (Exit Code 3010)
     
     # SFC Phase Results
-    SFCSuccess = $false                  # True if SFC scan completed successfully
-    SFCCorruptionFound = $false          # True if SFC found corruption
-    SFCCorruptionFixed = $false          # True if SFC fixed the corruption
+    SFCSuccess                 = $false                  # True if SFC scan completed successfully
+    SFCCorruptionFound         = $false          # True if SFC found corruption
+    SFCCorruptionFixed         = $false          # True if SFC fixed the corruption
     
     # System Pre-Check Results
-    PendingRebootDetected = $false       # True if system had pending reboot before repair
-    InitialDiskSpaceGB = 0               # Free disk space at start (GB)
-    FinalDiskSpaceGB = 0                 # Free disk space at end (GB)
+    PendingRebootDetected      = $false       # True if system had pending reboot before repair
+    InitialDiskSpaceGB         = 0               # Free disk space at start (GB)
+    FinalDiskSpaceGB           = 0                 # Free disk space at end (GB)
     
     # Restore Point Information
-    RestorePointCreated = $false         # True if restore point was successfully created
+    RestorePointCreated        = $false         # True if restore point was successfully created
     RestorePointSequenceNumber = $null   # Sequence number of created restore point
-    RestorePointDescription = ""         # Description of restore point
+    RestorePointDescription    = ""         # Description of restore point
     
     # CBS Log Details
-    CBSLogParsed = $false                # True if CBS.log was successfully parsed
-    CBSLogCorruptedFiles = @()           # List of corrupted files found in CBS.log
-    CBSLogRepairActions = @()            # List of repair actions from CBS.log
+    CBSLogParsed               = $false                # True if CBS.log was successfully parsed
+    CBSLogCorruptedFiles       = @()           # List of corrupted files found in CBS.log
+    CBSLogRepairActions        = @()            # List of repair actions from CBS.log
     
     # Pre/Post Health Comparison
-    PreRepairHealth = @{}                # Component store health state BEFORE repair operations
-    PostRepairHealth = @{}               # Component store health state AFTER repair operations
-    HealthImproved = $false              # True if health status improved after repairs
+    PreRepairHealth            = @{}                # Component store health state BEFORE repair operations
+    PostRepairHealth           = @{}               # Component store health state AFTER repair operations
+    HealthImproved             = $false              # True if health status improved after repairs
     
     # Timing Information (for performance tracking and reporting)
-    CheckHealthDuration = ""             # Time taken for DISM CheckHealth
-    ScanHealthDuration = ""              # Time taken for DISM ScanHealth
-    RestoreHealthDuration = ""           # Time taken for DISM RestoreHealth
-    SFCDuration = ""                     # Time taken for SFC scan
-    TotalDuration = ""                   # Total script execution time
+    CheckHealthDuration        = ""             # Time taken for DISM CheckHealth
+    ScanHealthDuration         = ""              # Time taken for DISM ScanHealth
+    RestoreHealthDuration      = ""           # Time taken for DISM RestoreHealth
+    SFCDuration                = ""                     # Time taken for SFC scan
+    TotalDuration              = ""                   # Total script execution time
 }
 
 #==================================================================================================
@@ -364,7 +364,7 @@ function Test-SystemRequirements {
         #----- Check 4: Available Disk Space -----
         # Requirement: Minimum 2GB free space for DISM operations
         # Why: DISM downloads files from Windows Update and needs temporary storage
-        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object {$_.DeviceID -eq $env:SystemDrive}
+        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object { $_.DeviceID -eq $env:SystemDrive }
         $FreeSpaceGB = [math]::Round($SystemDrive.FreeSpace / 1GB, 2)
         $Global:RepairResults.InitialDiskSpaceGB = $FreeSpaceGB
         
@@ -401,7 +401,8 @@ function Get-DISMPath {
     # - This ensures we run the native 64-bit DISM, not the 32-bit version
     $DISMPath = if ([Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess) {
         "$env:SystemRoot\Sysnative\dism.exe"  # Bypass WOW64 redirection
-    } else {
+    }
+    else {
         "$env:SystemRoot\System32\dism.exe"   # Standard path
     }
     
@@ -424,7 +425,8 @@ function Get-SFCPath {
     # WOW64 Redirection Handling (same logic as Get-DISMPath)
     $SFCPath = if ([Environment]::Is64BitOperatingSystem -and -not [Environment]::Is64BitProcess) {
         "$env:SystemRoot\Sysnative\sfc.exe"   # Bypass WOW64 redirection
-    } else {
+    }
+    else {
         "$env:SystemRoot\System32\sfc.exe"    # Standard path
     }
     
@@ -448,9 +450,11 @@ function Format-Duration {
     
     if ($TimeSpan.TotalHours -ge 1) {
         return "{0} hours {1} minutes {2} seconds" -f [int]$TimeSpan.Hours, [int]$TimeSpan.Minutes, [int]$TimeSpan.Seconds
-    } elseif ($TimeSpan.TotalMinutes -ge 1) {
+    }
+    elseif ($TimeSpan.TotalMinutes -ge 1) {
         return "{0} minutes {1} seconds" -f [int]$TimeSpan.Minutes, [int]$TimeSpan.Seconds
-    } else {
+    }
+    else {
         return "{0} seconds" -f [int]$TimeSpan.TotalSeconds
     }
 }
@@ -477,7 +481,8 @@ function Test-InternetConnectivity {
             WriteLog "Status: Windows Update servers are reachable"
             WriteLog "Details: HTTPS connection to windowsupdate.microsoft.com successful"
             return $true
-        } else {
+        }
+        else {
             WriteLog "WARNING: Cannot reach Windows Update servers"
             WriteLog "Status: Network connectivity test FAILED"
             WriteLog "Impact: DISM RestoreHealth may fail without internet access"
@@ -576,7 +581,8 @@ function Test-PendingReboot {
             
             $Global:RepairResults.PendingRebootDetected = $true
             return $true
-        } else {
+        }
+        else {
             WriteLog "Result: No pending reboot detected"
             WriteLog "Status: System is in clean state for repair operations"
             $Global:RepairResults.PendingRebootDetected = $false
@@ -600,16 +606,16 @@ function Test-PendingReboot {
 #--------------------------------------------------------------------------------------------------
 function Test-DiskSpace {
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [double]$MinimumGB = 2.0,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]$Phase = "Operation",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [switch]$Silent = $false
     )
     
     try {
-        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object {$_.DeviceID -eq $env:SystemDrive}
+        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object { $_.DeviceID -eq $env:SystemDrive }
         $FreeSpaceGB = [math]::Round($SystemDrive.FreeSpace / 1GB, 2)
         
         # Only log if not silent mode or if there's an issue
@@ -635,10 +641,12 @@ function Test-DiskSpace {
             WriteLog "========================================="
             WriteLog ""
             return $false
-        } elseif ($FreeSpaceGB -lt ($MinimumGB * 1.5)) {
+        }
+        elseif ($FreeSpaceGB -lt ($MinimumGB * 1.5)) {
             WriteLog "WARNING: Disk space is tight (${FreeSpaceGB} GB) - monitor closely"
             return $true
-        } else {
+        }
+        else {
             # Only log "sufficient space" if not in silent mode
             if (-not $Silent) {
                 WriteLog "Status: Sufficient disk space available"
@@ -680,8 +688,8 @@ function New-SystemRestorePoint {
         # RestorePointType: MODIFY_SETTINGS - Used for system modifications/repairs
         try {
             Checkpoint-Computer -Description $Description `
-                               -RestorePointType "MODIFY_SETTINGS" `
-                               -ErrorAction Stop | Out-Null
+                -RestorePointType "MODIFY_SETTINGS" `
+                -ErrorAction Stop | Out-Null
             
             # Get the sequence number of the newly created restore point
             Start-Sleep -Seconds 2
@@ -710,7 +718,8 @@ function New-SystemRestorePoint {
                 WriteLog ""
                 
                 return $true
-            } else {
+            }
+            else {
                 WriteLog "WARNING: Restore point creation command succeeded but cannot verify"
                 $Global:RepairResults.RestorePointCreated = $false
                 return $false
@@ -783,7 +792,7 @@ function Get-CBSLogDetails {
             WriteLog "WARNING: CBS.log not found at: $CBSLogPath"
             WriteLog "CBS.log is created by DISM/SFC operations - may not exist if no scans run"
             $Global:RepairResults.CBSLogParsed = $false
-            return @{CorruptedFiles = @(); RepairActions = @()}
+            return @{CorruptedFiles = @(); RepairActions = @() }
         }
         
         WriteLog "CBS.log Location: $CBSLogPath"
@@ -869,14 +878,14 @@ function Get-CBSLogDetails {
         
         return @{
             CorruptedFiles = $CorruptedFiles
-            RepairActions = $RepairActions
+            RepairActions  = $RepairActions
         }
     }
     catch {
         WriteLog "WARNING: Failed to parse CBS.log - $($_.Exception.Message)"
         WriteLog "CBS.log may be locked by another process or corrupted"
         $Global:RepairResults.CBSLogParsed = $false
-        return @{CorruptedFiles = @(); RepairActions = @()}
+        return @{CorruptedFiles = @(); RepairActions = @() }
     }
 }
 
@@ -888,11 +897,11 @@ function Get-CBSLogDetails {
 #--------------------------------------------------------------------------------------------------
 function Get-ComponentStoreHealth {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$DISMPath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]$Phase = "Unknown",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [switch]$Quiet = $false
     )
     
@@ -902,13 +911,13 @@ function Get-ComponentStoreHealth {
     }
     
     $HealthData = @{
-        Phase = $Phase
-        Timestamp = Get-Date -Format "yyyy/MM/dd HH:mm:ss"
-        HealthState = "Unknown"
-        IsRepairable = $null
+        Phase              = $Phase
+        Timestamp          = Get-Date -Format "yyyy/MM/dd HH:mm:ss"
+        HealthState        = "Unknown"
+        IsRepairable       = $null
         CorruptionDetected = $false
-        RawOutput = ""
-        ExitCode = -1
+        RawOutput          = ""
+        ExitCode           = -1
     }
     
     try {
@@ -920,12 +929,12 @@ function Get-ComponentStoreHealth {
         $TempOutputFile = "$env:TEMP\dism_health_check_$Phase.txt"
         
         $HealthProcess = Start-Process $DISMPath `
-                                       -ArgumentList "/Online", "/Cleanup-Image", "/CheckHealth" `
-                                       -Wait `
-                                       -PassThru `
-                                       -WindowStyle Hidden `
-                                       -RedirectStandardOutput $TempOutputFile `
-                                       -ErrorAction Stop
+            -ArgumentList "/Online", "/Cleanup-Image", "/CheckHealth" `
+            -Wait `
+            -PassThru `
+            -WindowStyle Hidden `
+            -RedirectStandardOutput $TempOutputFile `
+            -ErrorAction Stop
         
         $HealthData.ExitCode = $HealthProcess.ExitCode
         
@@ -989,9 +998,9 @@ function Get-ComponentStoreHealth {
 #--------------------------------------------------------------------------------------------------
 function Compare-HealthStates {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]$PreHealth,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [hashtable]$PostHealth
     )
     
@@ -1064,7 +1073,7 @@ function Compare-HealthStates {
 #--------------------------------------------------------------------------------------------------
 function Clear-TempFiles {
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [switch]$Silent = $false
     )
     
@@ -1097,7 +1106,8 @@ function Clear-TempFiles {
                 if (-not $Silent) {
                     WriteLog "Removed: $TempFile"
                 }
-            } else {
+            }
+            else {
                 $FilesNotFound++
             }
         }
@@ -1122,7 +1132,7 @@ function Clear-TempFiles {
 #--------------------------------------------------------------------------------------------------
 function Register-TerminationHandler {
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$MainLogFile
     )
     
@@ -1165,7 +1175,8 @@ Emergency cleanup log: $EmergencyLogFile
             if ($LogFilePath -and (Test-Path $LogFilePath -ErrorAction SilentlyContinue)) {
                 Add-Content -Path $LogFilePath -Value $ManualStopMessage -ErrorAction SilentlyContinue
                 "$Timestamp Script execution stopped by user - logged to main log file" | Out-File -FilePath $EmergencyLogFile -Append
-            } else {
+            }
+            else {
                 "$Timestamp WARNING: Could not write to main log file: $LogFilePath" | Out-File -FilePath $EmergencyLogFile -Append
             }
             
@@ -1226,9 +1237,9 @@ function Start-WindowsUpdateServices {
     try {
         # Services required for DISM RestoreHealth to access Windows Update
         $RequiredServices = @(
-            @{Name="wuauserv"; DisplayName="Windows Update"},
-            @{Name="BITS"; DisplayName="Background Intelligent Transfer Service"},
-            @{Name="TrustedInstaller"; DisplayName="Windows Modules Installer"}
+            @{Name = "wuauserv"; DisplayName = "Windows Update" },
+            @{Name = "BITS"; DisplayName = "Background Intelligent Transfer Service" },
+            @{Name = "TrustedInstaller"; DisplayName = "Windows Modules Installer" }
         )
         
         $AllServicesRunning = $true
@@ -1255,7 +1266,8 @@ function Start-WindowsUpdateServices {
                     $ServiceStatus = Get-Service -Name $Service.Name -ErrorAction Stop
                     if ($ServiceStatus.Status -eq 'Running') {
                         WriteLog "  Result: Service started successfully"
-                    } else {
+                    }
+                    else {
                         WriteLog "  WARNING: Service failed to start (Status: $($ServiceStatus.Status))"
                         $AllServicesRunning = $false
                     }
@@ -1264,7 +1276,8 @@ function Start-WindowsUpdateServices {
                     WriteLog "  ERROR: Failed to start service - $($_.Exception.Message)"
                     $AllServicesRunning = $false
                 }
-            } else {
+            }
+            else {
                 WriteLog "  Result: Service is already running"
             }
         }
@@ -1273,7 +1286,8 @@ function Start-WindowsUpdateServices {
         if ($AllServicesRunning) {
             WriteLog "Windows Update Services: All required services are running"
             return $true
-        } else {
+        }
+        else {
             WriteLog "WARNING: Some Windows Update services are not running"
             WriteLog "IMPACT: DISM RestoreHealth may fail or use fallback sources"
             return $false
@@ -1298,17 +1312,17 @@ function Export-RepairResultsToJSON {
         
         # Prepare structured output with additional metadata
         $JsonOutput = @{
-            Metadata = @{
-                ScriptName = $ScriptName
-                ExecutionDate = Get-Date -Format "yyyy-MM-dd"
-                ExecutionTime = Get-Date -Format "HH:mm:ss"
-                ComputerName = $env:COMPUTERNAME
+            Metadata      = @{
+                ScriptName     = $ScriptName
+                ExecutionDate  = Get-Date -Format "yyyy-MM-dd"
+                ExecutionTime  = Get-Date -Format "HH:mm:ss"
+                ComputerName   = $env:COMPUTERNAME
                 WindowsVersion = (Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop).Version
-                WindowsBuild = (Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop).BuildNumber
+                WindowsBuild   = (Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop).BuildNumber
             }
             RepairResults = $Global:RepairResults
-            ExitCode = $null  # Will be set by caller
-            LogFilePath = $LogFile
+            ExitCode      = $null  # Will be set by caller
+            LogFilePath   = $LogFile
         }
         
         # Generate JSON file path
@@ -1362,12 +1376,12 @@ function Invoke-DISMCheckHealth {
             
             WriteLog "Executing: DISM.exe /Online /Cleanup-Image /CheckHealth"
             $CheckHealthResult = Start-Process $DISMPath `
-                                              -ArgumentList "/Online", "/Cleanup-Image", "/CheckHealth" `
-                                              -Wait `
-                                              -PassThru `
-                                              -WindowStyle Hidden `
-                                              -RedirectStandardOutput "$env:TEMP\dism_checkhealth_output.txt" `
-                                              -RedirectStandardError "$env:TEMP\dism_checkhealth_error.txt"
+                -ArgumentList "/Online", "/Cleanup-Image", "/CheckHealth" `
+                -Wait `
+                -PassThru `
+                -WindowStyle Hidden `
+                -RedirectStandardOutput "$env:TEMP\dism_checkhealth_output.txt" `
+                -RedirectStandardError "$env:TEMP\dism_checkhealth_error.txt"
             
             $EndTime = Get-Date
             $Duration = $EndTime - $StartTime
@@ -1382,7 +1396,8 @@ function Invoke-DISMCheckHealth {
                 $Global:RepairResults.DISMCheckHealthSuccess = $true
                 $Success = $true
                 return $true
-            } else {
+            }
+            else {
                 WriteLog "Result: Potential corruption detected (Exit Code: $($CheckHealthResult.ExitCode))"
                 WriteLog "Recommendation: Proceeding to ScanHealth for detailed analysis"
                 return $false
@@ -1393,7 +1408,8 @@ function Invoke-DISMCheckHealth {
             
             if ($Attempt -lt $MaxRetries) {
                 WriteLog "Will retry operation (transient error may resolve)"
-            } else {
+            }
+            else {
                 WriteLog "Max retries reached - operation failed"
                 return $false
             }
@@ -1420,12 +1436,12 @@ function Invoke-DISMScanHealth {
     try {
         WriteLog "Executing: DISM.exe /Online /Cleanup-Image /ScanHealth"
         $ScanHealthResult = Start-Process $DISMPath `
-                                         -ArgumentList "/Online", "/Cleanup-Image", "/ScanHealth" `
-                                         -Wait `
-                                         -PassThru `
-                                         -WindowStyle Hidden `
-                                         -RedirectStandardOutput "$env:TEMP\dism_scanhealth_output.txt" `
-                                         -RedirectStandardError "$env:TEMP\dism_scanhealth_error.txt"
+            -ArgumentList "/Online", "/Cleanup-Image", "/ScanHealth" `
+            -Wait `
+            -PassThru `
+            -WindowStyle Hidden `
+            -RedirectStandardOutput "$env:TEMP\dism_scanhealth_output.txt" `
+            -RedirectStandardError "$env:TEMP\dism_scanhealth_error.txt"
         
         $EndTime = Get-Date
         $Duration = $EndTime - $StartTime
@@ -1439,7 +1455,8 @@ function Invoke-DISMScanHealth {
             WriteLog "Result: No corruption found in component store"
             $Global:RepairResults.DISMScanHealthSuccess = $true
             return $true
-        } else {
+        }
+        else {
             WriteLog "Result: Corruption detected in component store (Exit Code: $($ScanHealthResult.ExitCode))"
             WriteLog "Recommendation: Proceeding to RestoreHealth for repair"
             return $false
@@ -1482,7 +1499,7 @@ function Invoke-DISMRestoreHealth {
             }
             
             # Build argument list dynamically to support /Source and /LimitAccess
-            $dismArgs = @('/Online','/Cleanup-Image','/RestoreHealth')
+            $dismArgs = @('/Online', '/Cleanup-Image', '/RestoreHealth')
             if ($SourcePath) {
                 WriteLog "Using DISM Source: $SourcePath"
                 $dismArgs += "/Source:$SourcePath"
@@ -1494,12 +1511,12 @@ function Invoke-DISMRestoreHealth {
 
             WriteLog "Executing: DISM.exe $($dismArgs -join ' ')"
             $RestoreHealthResult = Start-Process $DISMPath `
-                                                -ArgumentList $dismArgs `
-                                                -Wait `
-                                                -PassThru `
-                                                -WindowStyle Hidden `
-                                                -RedirectStandardOutput "$env:TEMP\dism_restorehealth_output.txt" `
-                                                -RedirectStandardError "$env:TEMP\dism_restorehealth_error.txt"
+                -ArgumentList $dismArgs `
+                -Wait `
+                -PassThru `
+                -WindowStyle Hidden `
+                -RedirectStandardOutput "$env:TEMP\dism_restorehealth_output.txt" `
+                -RedirectStandardError "$env:TEMP\dism_restorehealth_error.txt"
 
             $EndTime = Get-Date
             $Duration = $EndTime - $StartTime
@@ -1544,7 +1561,8 @@ function Invoke-DISMRestoreHealth {
                     WriteLog "Will retry operation (transient network/service errors may resolve)"
                     # Restart Windows Update services before retry
                     Start-WindowsUpdateServices | Out-Null
-                } else {
+                }
+                else {
                     WriteLog "Max retries reached - RestoreHealth failed"
                     WriteLog "Recommendation: Check network connection, verify Windows Update service status"
                     
@@ -1560,7 +1578,8 @@ function Invoke-DISMRestoreHealth {
             
             if ($Attempt -lt $MaxRetries) {
                 WriteLog "Will retry operation (exception may be transient)"
-            } else {
+            }
+            else {
                 WriteLog "Max retries reached - operation failed"
                 return $false
             }
@@ -1592,7 +1611,7 @@ function Invoke-DISMRestoreHealth {
 function Invoke-SFCRepair {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]$SFCPath
     )
     
@@ -1620,12 +1639,12 @@ function Invoke-SFCRepair {
         WriteLog "Please wait - SFC is scanning protected system files..."
         
         $SFCProcess = Start-Process -FilePath $SFCPath `
-                                     -ArgumentList "/scannow" `
-                                     -Wait `
-                                     -PassThru `
-                                     -NoNewWindow `
-                                     -RedirectStandardOutput "$env:TEMP\sfc_output.txt" `
-                                     -RedirectStandardError "$env:TEMP\sfc_error.txt"
+            -ArgumentList "/scannow" `
+            -Wait `
+            -PassThru `
+            -NoNewWindow `
+            -RedirectStandardOutput "$env:TEMP\sfc_output.txt" `
+            -RedirectStandardError "$env:TEMP\sfc_error.txt"
         
         # Calculate execution duration
         $SFCEndTime = Get-Date
@@ -1790,7 +1809,8 @@ function Start-DISMRepair {
         
         if ($CheckHealthSuccess) {
             WriteLog "PHASE 1 Result: No component store corruption detected"
-        } else {
+        }
+        else {
             WriteLog "PHASE 1 Result: Potential corruption detected - proceeding to ScanHealth"
         }
         
@@ -1821,7 +1841,8 @@ function Start-DISMRepair {
                 WriteLog "ERROR: Insufficient disk space for RestoreHealth download operations"
                 WriteLog "RestoreHealth typically requires 2-3GB for component downloads"
                 $ExitCode = 2  # Partial success
-            } else {
+            }
+            else {
                 Start-WindowsUpdateServices | Out-Null
                 $RestoreHealthSuccess = Invoke-DISMRestoreHealth -DISMPath $DISMPath -SourcePath $DISMSource -LimitAccess:$LimitAccess
                 
@@ -1832,14 +1853,16 @@ function Start-DISMRepair {
             if (-not $RestoreHealthSuccess) {
                 WriteLog "WARNING: RestoreHealth completed with issues"
                 $ExitCode = 2  # Partial success
-            } elseif ($Global:RepairResults.RebootRequired) {
+            }
+            elseif ($Global:RepairResults.RebootRequired) {
                 WriteLog ""
                 WriteLog "INFO: RestoreHealth succeeded with pending reboot requirement"
                 WriteLog "INFO: Component files are staged but require restart to activate"
                 WriteLog "INFO: Continuing with SFC phase using current component store state"
                 # Exit code remains 0 - reboot is a post-action, not a failure
             }
-        } else {
+        }
+        else {
             WriteLog ""
             WriteLog "No corruption detected - RestoreHealth repair not required"
             $Global:RepairResults.DISMRestoreHealthSuccess = $true
@@ -1859,7 +1882,8 @@ function Start-DISMRepair {
             WriteLog "Impact: Only DISM Component Store repair performed"
             WriteLog "Recommendation: Run SFC manually later if System32 file issues persist"
             WriteLog ""
-        } else {
+        }
+        else {
             WriteLog ""
             WriteLog "Proceeding to Phase 4: SFC scan (Tier 2 System32 file repair)"
             WriteLog "Microsoft Guidance: Always run SFC after DISM for complete repair coverage"
@@ -1868,7 +1892,8 @@ function Start-DISMRepair {
             if (-not $SFCPath) {
                 WriteLog "ERROR: SFC executable not found - skipping Phase 4"
                 $ExitCode = 2  # Partial success
-            } else {
+            }
+            else {
                 # Check disk space before SFC scan (silent unless issues)
                 if (-not (Test-DiskSpace -MinimumGB 1 -Phase "Before SFC Scan" -Silent)) {
                     WriteLog "WARNING: Low disk space before SFC scan"
@@ -1907,7 +1932,7 @@ function Start-DISMRepair {
         $Global:RepairResults.TotalDuration = Format-Duration $TotalDuration
         
         # Record final disk space
-        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object {$_.DeviceID -eq $env:SystemDrive}
+        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object { $_.DeviceID -eq $env:SystemDrive }
         $Global:RepairResults.FinalDiskSpaceGB = [math]::Round($SystemDrive.FreeSpace / 1GB, 2)
         
         WriteLog ""
@@ -1957,9 +1982,11 @@ function Start-DISMRepair {
         $DiskChange = $Global:RepairResults.InitialDiskSpaceGB - $Global:RepairResults.FinalDiskSpaceGB
         if ($DiskChange -gt 0) {
             WriteLog "  Space Consumed: $([math]::Round($DiskChange, 2)) GB"
-        } elseif ($DiskChange -lt 0) {
+        }
+        elseif ($DiskChange -lt 0) {
             WriteLog "  Space Freed: $([math]::Round([Math]::Abs($DiskChange), 2)) GB"
-        } else {
+        }
+        else {
             WriteLog "  Net Change: 0 GB"
         }
         WriteLog ""
@@ -1971,7 +1998,8 @@ function Start-DISMRepair {
             WriteLog "  Description: $($Global:RepairResults.RestorePointDescription)"
             WriteLog "  Location: C:\System Volume Information\"
             WriteLog "  Rollback: Use System Restore to revert changes if needed"
-        } else {
+        }
+        else {
             WriteLog "  Status: NOT CREATED (System Restore disabled or recent restore point exists)"
             WriteLog "  Impact: Manual backup recommended for rollback capability"
         }
@@ -1989,7 +2017,8 @@ function Start-DISMRepair {
             }
             WriteLog "  Repair Actions Logged: $($Global:RepairResults.CBSLogRepairActions.Count)"
             WriteLog "  Full Log: C:\Windows\Logs\CBS\CBS.log"
-        } else {
+        }
+        else {
             WriteLog "  Log Parsed: NO (CBS.log not accessible or no operations performed)"
         }
         WriteLog ""
@@ -2006,12 +2035,15 @@ function Start-DISMRepair {
             WriteLog ""
             if ($Global:RepairResults.HealthImproved) {
                 WriteLog "  ✓ OUTCOME: HEALTH IMPROVED - Repairs were SUCCESSFUL"
-            } elseif ($Global:RepairResults.PreRepairHealth.CorruptionDetected -eq $false) {
+            }
+            elseif ($Global:RepairResults.PreRepairHealth.CorruptionDetected -eq $false) {
                 WriteLog "  ✓ OUTCOME: HEALTH MAINTAINED - System was already healthy"
-            } else {
+            }
+            else {
                 WriteLog "  ✗ OUTCOME: HEALTH UNCHANGED - Manual intervention may be required"
             }
-        } else {
+        }
+        else {
             WriteLog "  Health Comparison: NOT AVAILABLE (Feature not executed)"
         }
         WriteLog ""
@@ -2050,7 +2082,8 @@ function Start-DISMRepair {
             if ($Global:RepairResults.RebootRequired) {
                 WriteLog "POST-ACTION: Schedule system restart to finalize component replacement"
             }
-        } else {
+        }
+        else {
             WriteLog "FINAL RESULT: Repair operations completed with warnings"
             WriteLog "SYSTEM STATUS: Review phase details above for specific issues"
         }
@@ -2126,7 +2159,8 @@ try {
     # Return proper exit code for monitoring systems
     if ($Host.Name -eq "ConsoleHost") {
         exit $FinalExitCode
-    } else {
+    }
+    else {
         WriteLog "Running in $($Host.Name) - Exit code: $FinalExitCode"
     }
 }
