@@ -15,6 +15,13 @@ RELEASENOTES            Enterprise-grade Windows repair with 7 core reliability 
                         ✓ CBS.log Deep Analysis - Parses 5000 lines to extract corruption details
                         ✓ Pre/Post Health Comparison - Component store state validation
                         ✓ Enhanced Helper Functions - Internet connectivity, reboot detection, disk monitoring
+                        
+                        CODE QUALITY IMPROVEMENTS (4 features):
+                        ✓ Feature #1: Pre/Post Repair Health Check - Measurable health state tracking
+                        ✓ Feature #2: Centralized Temp File Cleanup - Emergency termination handling
+                        ✓ Feature #3: ErrorAction Consistency - Standardized error handling across all cmdlets
+                        ⏳ Feature #4: Long Path Handling - Support for paths >260 characters (pending)
+                        
                         - Two-tier repair: Component Store (DISM) + System Files (SFC)
                         - Exit code handling (0=Success, 1=Failure, 2=Partial, 3=Admin Required)
                         - Comprehensive logging with timestamps and duration tracking
@@ -251,6 +258,11 @@ $Global:RepairResults = @{
     CBSLogCorruptedFiles = @()           # List of corrupted files found in CBS.log
     CBSLogRepairActions = @()            # List of repair actions from CBS.log
     
+    # Pre/Post Health Comparison
+    PreRepairHealth = @{}                # Component store health state BEFORE repair operations
+    PostRepairHealth = @{}               # Component store health state AFTER repair operations
+    HealthImproved = $false              # True if health status improved after repairs
+    
     # Timing Information (for performance tracking and reporting)
     CheckHealthDuration = ""             # Time taken for DISM CheckHealth
     ScanHealthDuration = ""              # Time taken for DISM ScanHealth
@@ -262,6 +274,40 @@ $Global:RepairResults = @{
 #==================================================================================================
 # REGION: HELPER FUNCTIONS
 # Purpose: Utility functions used across the script for validation and formatting
+#
+# ERRORACTION CONSISTENCY POLICY (Feature #3):
+# ---------------------------------------------
+# This script follows a standardized error handling approach for predictable behavior:
+#
+# 1. CRITICAL OPERATIONS (-ErrorAction Stop):
+#    - System information retrieval (Get-CimInstance for OS info, disk space)
+#    - DISM/SFC process execution (Start-Process for repair operations)
+#    - System restore point creation (Checkpoint-Computer)
+#    - Windows Update service management (Start-Service, Get-Service)
+#    - CBS.log parsing (Get-Content, Get-Item for file operations)
+#    - JSON export file operations (Get-Item for file size checks)
+#    WHY: These operations are essential for script execution. Failures should halt execution
+#         and trigger try-catch error handling for proper logging and cleanup.
+#
+# 2. RECOVERABLE OPERATIONS (-ErrorAction SilentlyContinue):
+#    - File existence checks (Test-Path for optional files/registry keys)
+#    - Temporary file cleanup (Remove-Item for cleanup operations)
+#    - Service status checks (Get-Service when service might not exist)
+#    - Optional registry reads (Get-ItemProperty for computer name checks)
+#    - Health check temp file reads (Get-Content for DISM output files)
+#    WHY: These operations can fail gracefully without halting execution. Failures are
+#         logged as warnings but don't prevent script from completing its primary mission.
+#
+# 3. NETWORK OPERATIONS (-ErrorAction Stop with -WarningAction SilentlyContinue):
+#    - Internet connectivity tests (Test-NetConnection)
+#    WHY: Network failures should be caught by try-catch, but warnings (DNS delays, etc.)
+#         should be suppressed to reduce log noise.
+#
+# BENEFITS:
+# - Predictable error propagation (know exactly where failures trigger catch blocks)
+# - Easier debugging (consistent patterns across entire script)
+# - Better separation of critical vs. non-critical operations
+# - Reduced log noise from expected failures (missing optional files, etc.)
 #==================================================================================================
 #region Helper Functions
 
@@ -318,7 +364,7 @@ function Test-SystemRequirements {
         #----- Check 4: Available Disk Space -----
         # Requirement: Minimum 2GB free space for DISM operations
         # Why: DISM downloads files from Windows Update and needs temporary storage
-        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object {$_.DeviceID -eq $env:SystemDrive}
+        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object {$_.DeviceID -eq $env:SystemDrive}
         $FreeSpaceGB = [math]::Round($SystemDrive.FreeSpace / 1GB, 2)
         $Global:RepairResults.InitialDiskSpaceGB = $FreeSpaceGB
         
@@ -359,7 +405,7 @@ function Get-DISMPath {
         "$env:SystemRoot\System32\dism.exe"   # Standard path
     }
     
-    if (-not (Test-Path $DISMPath)) {
+    if (-not (Test-Path $DISMPath -ErrorAction SilentlyContinue)) {
         WriteLog "ERROR: DISM executable not found at: $DISMPath"
         return $null
     }
@@ -382,7 +428,7 @@ function Get-SFCPath {
         "$env:SystemRoot\System32\sfc.exe"    # Standard path
     }
     
-    if (-not (Test-Path $SFCPath)) {
+    if (-not (Test-Path $SFCPath -ErrorAction SilentlyContinue)) {
         WriteLog "ERROR: SFC executable not found at: $SFCPath"
         return $null
     }
@@ -470,7 +516,7 @@ function Test-PendingReboot {
     try {
         # Check 1: Component Based Servicing (CBS) pending reboot
         # Indicates Windows Update or DISM operations require reboot
-        if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending") {
+        if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Component Based Servicing\RebootPending" -ErrorAction SilentlyContinue) {
             $RebootPending = $true
             $RebootReasons += "Component Based Servicing (CBS) operations pending"
             WriteLog "Found: Component Based Servicing reboot flag"
@@ -478,7 +524,7 @@ function Test-PendingReboot {
         
         # Check 2: Windows Update pending reboot
         # Indicates Windows Update has installed updates requiring restart
-        if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired") {
+        if (Test-Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Auto Update\RebootRequired" -ErrorAction SilentlyContinue) {
             $RebootPending = $true
             $RebootReasons += "Windows Update installations pending"
             WriteLog "Found: Windows Update reboot flag"
@@ -486,7 +532,7 @@ function Test-PendingReboot {
         
         # Check 3: Pending file rename operations
         # Indicates files need to be replaced/moved on next boot
-        if (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations") {
+        if (Test-Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\PendingFileRenameOperations" -ErrorAction SilentlyContinue) {
             $RebootPending = $true
             $RebootReasons += "Pending file rename operations"
             WriteLog "Found: Pending file rename operations"
@@ -557,14 +603,19 @@ function Test-DiskSpace {
         [Parameter(Mandatory=$false)]
         [double]$MinimumGB = 2.0,
         [Parameter(Mandatory=$false)]
-        [string]$Phase = "Operation"
+        [string]$Phase = "Operation",
+        [Parameter(Mandatory=$false)]
+        [switch]$Silent = $false
     )
     
     try {
-        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk | Where-Object {$_.DeviceID -eq $env:SystemDrive}
+        $SystemDrive = Get-CimInstance -ClassName Win32_LogicalDisk -ErrorAction Stop | Where-Object {$_.DeviceID -eq $env:SystemDrive}
         $FreeSpaceGB = [math]::Round($SystemDrive.FreeSpace / 1GB, 2)
         
-        WriteLog "Disk Space Check ($Phase): ${FreeSpaceGB} GB available on $($env:SystemDrive)"
+        # Only log if not silent mode or if there's an issue
+        if (-not $Silent) {
+            WriteLog "Disk Space Check ($Phase): ${FreeSpaceGB} GB available on $($env:SystemDrive)"
+        }
         
         if ($FreeSpaceGB -lt $MinimumGB) {
             WriteLog ""
@@ -588,7 +639,10 @@ function Test-DiskSpace {
             WriteLog "WARNING: Disk space is tight (${FreeSpaceGB} GB) - monitor closely"
             return $true
         } else {
-            WriteLog "Status: Sufficient disk space available"
+            # Only log "sufficient space" if not in silent mode
+            if (-not $Silent) {
+                WriteLog "Status: Sufficient disk space available"
+            }
             return $true
         }
     }
@@ -725,7 +779,7 @@ function Get-CBSLogDetails {
     $RepairActions = @()
     
     try {
-        if (-not (Test-Path $CBSLogPath)) {
+        if (-not (Test-Path $CBSLogPath -ErrorAction SilentlyContinue)) {
             WriteLog "WARNING: CBS.log not found at: $CBSLogPath"
             WriteLog "CBS.log is created by DISM/SFC operations - may not exist if no scans run"
             $Global:RepairResults.CBSLogParsed = $false
@@ -733,7 +787,7 @@ function Get-CBSLogDetails {
         }
         
         WriteLog "CBS.log Location: $CBSLogPath"
-        $LogSize = [math]::Round((Get-Item $CBSLogPath).Length / 1MB, 2)
+        $LogSize = [math]::Round((Get-Item $CBSLogPath -ErrorAction Stop).Length / 1MB, 2)
         WriteLog "CBS.log Size: ${LogSize} MB"
         WriteLog "Parsing log file (last 5000 lines for recent operations)..."
         
@@ -827,6 +881,339 @@ function Get-CBSLogDetails {
 }
 
 #--------------------------------------------------------------------------------------------------
+# Function: Get-ComponentStoreHealth
+# Purpose: Captures component store health state for before/after comparison
+# Why Needed: Provides measurable proof that repairs actually improved system health
+# Returns: Hashtable with health status, repairable status, and corruption details
+#--------------------------------------------------------------------------------------------------
+function Get-ComponentStoreHealth {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$DISMPath,
+        [Parameter(Mandatory=$false)]
+        [string]$Phase = "Unknown",
+        [Parameter(Mandatory=$false)]
+        [switch]$Quiet = $false
+    )
+    
+    if (-not $Quiet) {
+        WriteLog ""
+        WriteLog "=== Capturing Component Store Health ($Phase) ==="
+    }
+    
+    $HealthData = @{
+        Phase = $Phase
+        Timestamp = Get-Date -Format "yyyy/MM/dd HH:mm:ss"
+        HealthState = "Unknown"
+        IsRepairable = $null
+        CorruptionDetected = $false
+        RawOutput = ""
+        ExitCode = -1
+    }
+    
+    try {
+        if (-not $Quiet) {
+            WriteLog "Executing: DISM.exe /Online /Cleanup-Image /CheckHealth"
+            WriteLog "Purpose: Capture current component store health state"
+        }
+        
+        $TempOutputFile = "$env:TEMP\dism_health_check_$Phase.txt"
+        
+        $HealthProcess = Start-Process $DISMPath `
+                                       -ArgumentList "/Online", "/Cleanup-Image", "/CheckHealth" `
+                                       -Wait `
+                                       -PassThru `
+                                       -WindowStyle Hidden `
+                                       -RedirectStandardOutput $TempOutputFile `
+                                       -ErrorAction Stop
+        
+        $HealthData.ExitCode = $HealthProcess.ExitCode
+        
+        # Read DISM output for detailed analysis
+        if (Test-Path $TempOutputFile -ErrorAction SilentlyContinue) {
+            $HealthData.RawOutput = Get-Content $TempOutputFile -Raw -ErrorAction SilentlyContinue
+        }
+        
+        # Interpret DISM CheckHealth exit code
+        switch ($HealthProcess.ExitCode) {
+            0 {
+                $HealthData.HealthState = "Healthy"
+                $HealthData.IsRepairable = $false
+                $HealthData.CorruptionDetected = $false
+                if (-not $Quiet) {
+                    WriteLog "Result: Component store is HEALTHY (No corruption detected)"
+                }
+            }
+            2 {
+                $HealthData.HealthState = "Corrupted"
+                $HealthData.IsRepairable = $true
+                $HealthData.CorruptionDetected = $true
+                if (-not $Quiet) {
+                    WriteLog "Result: Component store is CORRUPTED (Repairable)"
+                }
+            }
+            default {
+                $HealthData.HealthState = "Unknown/Error"
+                $HealthData.IsRepairable = $null
+                $HealthData.CorruptionDetected = $true
+                if (-not $Quiet) {
+                    WriteLog "Result: Component store status UNKNOWN (Exit Code: $($HealthProcess.ExitCode))"
+                }
+            }
+        }
+        
+        if (-not $Quiet) {
+            WriteLog "Health State: $($HealthData.HealthState)"
+            WriteLog "Corruption Detected: $($HealthData.CorruptionDetected)"
+            WriteLog "Exit Code: $($HealthData.ExitCode)"
+        }
+        
+        # Cleanup temp file
+        Remove-Item $TempOutputFile -Force -ErrorAction SilentlyContinue
+        
+        return $HealthData
+    }
+    catch {
+        WriteLog "ERROR: Failed to capture component store health - $($_.Exception.Message)"
+        $HealthData.HealthState = "Error"
+        $HealthData.RawOutput = $_.Exception.Message
+        return $HealthData
+    }
+}
+
+#--------------------------------------------------------------------------------------------------
+# Function: Compare-HealthStates
+# Purpose: Compares pre-repair and post-repair health states to measure improvement
+# Why Needed: Provides quantifiable success metrics for repair operations
+# Returns: $true if health improved, $false otherwise
+#--------------------------------------------------------------------------------------------------
+function Compare-HealthStates {
+    param(
+        [Parameter(Mandatory=$true)]
+        [hashtable]$PreHealth,
+        [Parameter(Mandatory=$true)]
+        [hashtable]$PostHealth
+    )
+    
+    WriteLog ""
+    WriteLog "=========================================="
+    WriteLog "PRE/POST REPAIR HEALTH COMPARISON"
+    WriteLog "=========================================="
+    WriteLog ""
+    
+    WriteLog "BEFORE REPAIR (Pre-Repair State):"
+    WriteLog "  Timestamp: $($PreHealth.Timestamp)"
+    WriteLog "  Health State: $($PreHealth.HealthState)"
+    WriteLog "  Corruption Detected: $($PreHealth.CorruptionDetected)"
+    WriteLog "  Exit Code: $($PreHealth.ExitCode)"
+    WriteLog ""
+    
+    WriteLog "AFTER REPAIR (Post-Repair State):"
+    WriteLog "  Timestamp: $($PostHealth.Timestamp)"
+    WriteLog "  Health State: $($PostHealth.HealthState)"
+    WriteLog "  Corruption Detected: $($PostHealth.CorruptionDetected)"
+    WriteLog "  Exit Code: $($PostHealth.ExitCode)"
+    WriteLog ""
+    
+    # Determine if health improved
+    $Improved = $false
+    
+    if ($PreHealth.CorruptionDetected -and -not $PostHealth.CorruptionDetected) {
+        WriteLog "OUTCOME: ✓ HEALTH IMPROVED - Corruption was REPAIRED"
+        WriteLog "  Before: Corrupted ($($PreHealth.HealthState))"
+        WriteLog "  After: Healthy ($($PostHealth.HealthState))"
+        WriteLog "  Verdict: Repair operation was SUCCESSFUL"
+        $Improved = $true
+    }
+    elseif (-not $PreHealth.CorruptionDetected -and -not $PostHealth.CorruptionDetected) {
+        WriteLog "OUTCOME: ✓ HEALTH MAINTAINED - No corruption before or after"
+        WriteLog "  Before: Healthy ($($PreHealth.HealthState))"
+        WriteLog "  After: Healthy ($($PostHealth.HealthState))"
+        WriteLog "  Verdict: System was already healthy (preventive maintenance)"
+        $Improved = $false
+    }
+    elseif ($PreHealth.CorruptionDetected -and $PostHealth.CorruptionDetected) {
+        WriteLog "OUTCOME: ✗ HEALTH UNCHANGED - Corruption still present"
+        WriteLog "  Before: Corrupted ($($PreHealth.HealthState))"
+        WriteLog "  After: Still Corrupted ($($PostHealth.HealthState))"
+        WriteLog "  Verdict: Repair operation did NOT resolve all issues"
+        WriteLog "  Recommendation: Manual intervention may be required"
+        $Improved = $false
+    }
+    else {
+        WriteLog "OUTCOME: ⚠ UNEXPECTED STATE CHANGE"
+        WriteLog "  Before: $($PreHealth.HealthState)"
+        WriteLog "  After: $($PostHealth.HealthState)"
+        WriteLog "  Verdict: Unusual state transition detected"
+        $Improved = $false
+    }
+    
+    WriteLog ""
+    WriteLog "=========================================="
+    WriteLog ""
+    
+    $Global:RepairResults.HealthImproved = $Improved
+    return $Improved
+}
+
+#--------------------------------------------------------------------------------------------------
+# Function: Clear-TempFiles
+# Purpose: Centralized cleanup of temporary files created during script execution
+# Why Needed: Prevents orphaned temp files from consuming disk space
+# Returns: $true if cleanup successful, $false if issues encountered
+#--------------------------------------------------------------------------------------------------
+function Clear-TempFiles {
+    param(
+        [Parameter(Mandatory=$false)]
+        [switch]$Silent = $false
+    )
+    
+    if (-not $Silent) {
+        WriteLog ""
+        WriteLog "=== Cleaning Up Temporary Files ==="
+    }
+    
+    $CleanupSuccess = $true
+    $TempFiles = @(
+        "$env:TEMP\dism_checkhealth_output.txt",
+        "$env:TEMP\dism_checkhealth_error.txt",
+        "$env:TEMP\dism_scanhealth_output.txt",
+        "$env:TEMP\dism_scanhealth_error.txt",
+        "$env:TEMP\dism_restorehealth_output.txt",
+        "$env:TEMP\dism_restorehealth_error.txt",
+        "$env:TEMP\dism_health_check_Pre-Repair.txt",
+        "$env:TEMP\dism_health_check_Post-Repair.txt"
+    )
+    
+    $FilesRemoved = 0
+    $FilesNotFound = 0
+    $FilesFailed = 0
+    
+    foreach ($TempFile in $TempFiles) {
+        try {
+            if (Test-Path $TempFile -ErrorAction SilentlyContinue) {
+                Remove-Item $TempFile -Force -ErrorAction Stop
+                $FilesRemoved++
+                if (-not $Silent) {
+                    WriteLog "Removed: $TempFile"
+                }
+            } else {
+                $FilesNotFound++
+            }
+        }
+        catch {
+            $FilesFailed++
+            $CleanupSuccess = $false
+            WriteLog "WARNING: Failed to remove $TempFile - $($_.Exception.Message)"
+        }
+    }
+    
+    if (-not $Silent) {
+        WriteLog "Cleanup Summary: $FilesRemoved removed, $FilesNotFound not found, $FilesFailed failed"
+    }
+    
+    return $CleanupSuccess
+}
+
+#--------------------------------------------------------------------------------------------------
+# Function: Register-TerminationHandler
+# Purpose: Registers cleanup actions for unexpected script termination (Ctrl+C, errors, etc.)
+# Why Needed: Ensures temp files are cleaned up even if script is interrupted
+#--------------------------------------------------------------------------------------------------
+function Register-TerminationHandler {
+    param(
+        [Parameter(Mandatory=$true)]
+        [string]$MainLogFile
+    )
+    
+    # Register cleanup action for Ctrl+C (SIGINT) termination
+    $null = Register-EngineEvent -SourceIdentifier PowerShell.Exiting -Action {
+        try {
+            # Get the log file path from the event data passed via -MessageData
+            $LogFilePath = $Event.MessageData
+            $EmergencyLogFile = "$env:TEMP\dism_repair_emergency_cleanup.log"
+            $Timestamp = (Get-Date).toString("yyyy/MM/dd HH:mm:ss")
+            
+            # Log to BOTH main log file and emergency log file
+            $ManualStopMessage = @"
+
+========================================
+SCRIPT EXECUTION INTERRUPTED
+========================================
+Timestamp: $Timestamp
+Reason: Manual intervention detected (User pressed Ctrl+C or terminated process)
+Status: Script execution was stopped before completion
+Action: Emergency cleanup initiated
+
+IMPACT:
+  - Repair operations were NOT completed
+  - System may still have corruption issues
+  - Temp files are being cleaned up
+
+RECOMMENDATION:
+  1. Review this log file to see where execution stopped
+  2. Determine if system needs repair
+  3. Re-run the script when ready
+  4. Allow script to complete fully for best results
+
+Emergency cleanup log: $EmergencyLogFile
+========================================
+
+"@
+            
+            # Write to main log file
+            if ($LogFilePath -and (Test-Path $LogFilePath -ErrorAction SilentlyContinue)) {
+                Add-Content -Path $LogFilePath -Value $ManualStopMessage -ErrorAction SilentlyContinue
+                "$Timestamp Script execution stopped by user - logged to main log file" | Out-File -FilePath $EmergencyLogFile -Append
+            } else {
+                "$Timestamp WARNING: Could not write to main log file: $LogFilePath" | Out-File -FilePath $EmergencyLogFile -Append
+            }
+            
+            # Write to emergency log file
+            "$Timestamp Emergency cleanup triggered (script termination detected)" | Out-File -FilePath $EmergencyLogFile -Append
+            
+            # Cleanup temp files
+            $TempFiles = @(
+                "$env:TEMP\dism_checkhealth_output.txt",
+                "$env:TEMP\dism_checkhealth_error.txt",
+                "$env:TEMP\dism_scanhealth_output.txt",
+                "$env:TEMP\dism_scanhealth_error.txt",
+                "$env:TEMP\dism_restorehealth_output.txt",
+                "$env:TEMP\dism_restorehealth_error.txt",
+                "$env:TEMP\dism_health_check_Pre-Repair.txt",
+                "$env:TEMP\dism_health_check_Post-Repair.txt"
+            )
+            
+            $FilesCleanedCount = 0
+            foreach ($TempFile in $TempFiles) {
+                if (Test-Path $TempFile -ErrorAction SilentlyContinue) {
+                    Remove-Item $TempFile -Force -ErrorAction SilentlyContinue
+                    "$Timestamp Cleaned up: $TempFile" | Out-File -FilePath $EmergencyLogFile -Append
+                    $FilesCleanedCount++
+                }
+            }
+            
+            "$Timestamp Emergency cleanup completed - $FilesCleanedCount temp files removed" | Out-File -FilePath $EmergencyLogFile -Append
+            
+            # Final message to main log
+            if ($LogFilePath -and (Test-Path $LogFilePath -ErrorAction SilentlyContinue)) {
+                "$Timestamp #####################SCRIPT TERMINATED BY USER#####################" | Out-File -FilePath $LogFilePath -Append -ErrorAction SilentlyContinue
+                "$Timestamp Emergency cleanup completed: $FilesCleanedCount temp files removed" | Out-File -FilePath $LogFilePath -Append -ErrorAction SilentlyContinue
+                "$Timestamp Exit Code: INTERRUPTED (Manual termination)" | Out-File -FilePath $LogFilePath -Append -ErrorAction SilentlyContinue
+            }
+        }
+        catch {
+            # Silent failure - don't block termination
+            $ErrorLog = "$env:TEMP\dism_repair_emergency_cleanup.log"
+            "ERROR: Emergency cleanup failed - $($_.Exception.Message)" | Out-File -FilePath $ErrorLog -Append -ErrorAction SilentlyContinue
+        }
+    } -MessageData $MainLogFile
+    
+    WriteLog "Termination handler registered for emergency cleanup"
+    WriteLog "Manual interruption (Ctrl+C) will be logged and cleanup will run automatically"
+}
+
+#--------------------------------------------------------------------------------------------------
 # Function: Start-WindowsUpdateServices
 # Purpose: Starts and verifies Windows Update services required for DISM RestoreHealth
 # Why Needed: RestoreHealth depends on Windows Update services to download repair components
@@ -865,7 +1252,7 @@ function Start-WindowsUpdateServices {
                     Start-Service -Name $Service.Name -ErrorAction Stop
                     Start-Sleep -Seconds 2  # Give service time to start
                     
-                    $ServiceStatus = Get-Service -Name $Service.Name
+                    $ServiceStatus = Get-Service -Name $Service.Name -ErrorAction Stop
                     if ($ServiceStatus.Status -eq 'Running') {
                         WriteLog "  Result: Service started successfully"
                     } else {
@@ -916,8 +1303,8 @@ function Export-RepairResultsToJSON {
                 ExecutionDate = Get-Date -Format "yyyy-MM-dd"
                 ExecutionTime = Get-Date -Format "HH:mm:ss"
                 ComputerName = $env:COMPUTERNAME
-                WindowsVersion = (Get-CimInstance -ClassName Win32_OperatingSystem).Version
-                WindowsBuild = (Get-CimInstance -ClassName Win32_OperatingSystem).BuildNumber
+                WindowsVersion = (Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop).Version
+                WindowsBuild = (Get-CimInstance -ClassName Win32_OperatingSystem -ErrorAction Stop).BuildNumber
             }
             RepairResults = $Global:RepairResults
             ExitCode = $null  # Will be set by caller
@@ -931,7 +1318,7 @@ function Export-RepairResultsToJSON {
         $JsonOutput | ConvertTo-Json -Depth 5 | Out-File -FilePath $JsonPath -Encoding UTF8 -Force
         
         WriteLog "JSON export successful: $JsonPath"
-        WriteLog "File size: $([math]::Round((Get-Item $JsonPath).Length / 1KB, 2)) KB"
+        WriteLog "File size: $([math]::Round((Get-Item $JsonPath -ErrorAction Stop).Length / 1KB, 2)) KB"
         
         return $JsonPath
     }
@@ -994,19 +1381,10 @@ function Invoke-DISMCheckHealth {
                 WriteLog "Result: No component store corruption detected"
                 $Global:RepairResults.DISMCheckHealthSuccess = $true
                 $Success = $true
-                
-                # Cleanup temp files
-                Remove-Item "$env:TEMP\dism_checkhealth_output.txt" -Force -ErrorAction SilentlyContinue
-                Remove-Item "$env:TEMP\dism_checkhealth_error.txt" -Force -ErrorAction SilentlyContinue
                 return $true
             } else {
                 WriteLog "Result: Potential corruption detected (Exit Code: $($CheckHealthResult.ExitCode))"
                 WriteLog "Recommendation: Proceeding to ScanHealth for detailed analysis"
-                $Success = $true
-                
-                # Cleanup temp files
-                Remove-Item "$env:TEMP\dism_checkhealth_output.txt" -Force -ErrorAction SilentlyContinue
-                Remove-Item "$env:TEMP\dism_checkhealth_error.txt" -Force -ErrorAction SilentlyContinue
                 return $false
             }
         }
@@ -1060,18 +1438,10 @@ function Invoke-DISMScanHealth {
         if ($ScanHealthResult.ExitCode -eq 0) {
             WriteLog "Result: No corruption found in component store"
             $Global:RepairResults.DISMScanHealthSuccess = $true
-            
-            # Cleanup temp files
-            Remove-Item "$env:TEMP\dism_scanhealth_output.txt" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$env:TEMP\dism_scanhealth_error.txt" -Force -ErrorAction SilentlyContinue
             return $true
         } else {
             WriteLog "Result: Corruption detected in component store (Exit Code: $($ScanHealthResult.ExitCode))"
             WriteLog "Recommendation: Proceeding to RestoreHealth for repair"
-            
-            # Cleanup temp files
-            Remove-Item "$env:TEMP\dism_scanhealth_output.txt" -Force -ErrorAction SilentlyContinue
-            Remove-Item "$env:TEMP\dism_scanhealth_error.txt" -Force -ErrorAction SilentlyContinue
             return $false
         }
     }
@@ -1380,6 +1750,9 @@ function Start-DISMRepair {
         WriteLog "=========================================="
         WriteLog "Process Start Time: $(Get-Date -Format 'yyyy/MM/dd HH:mm:ss')"
         
+        # Register termination handler for cleanup on unexpected exit (pass log file path)
+        Register-TerminationHandler -MainLogFile $LogFile
+        
         # Validate system requirements
         if (-not (Test-SystemRequirements)) {
             throw "System requirements validation failed"
@@ -1400,14 +1773,29 @@ function Start-DISMRepair {
             throw "DISM executable not found"
         }
         
-        # Phase 1: CheckHealth
-        if (-not (Test-DiskSpace -MinimumGB $MinimumDiskSpaceGB -Phase "Before CheckHealth")) {
-            throw "Insufficient disk space to proceed with DISM operations"
+        # FEATURE 6: Capture PRE-REPAIR component store health state
+        # This creates a baseline to measure repair effectiveness
+        # NOTE: This also serves as Phase 1 CheckHealth to avoid redundant DISM calls
+        WriteLog ""
+        WriteLog "=========================================="
+        WriteLog "PHASE 1 + Pre-Repair Health Baseline"
+        WriteLog "=========================================="
+        WriteLog "Note: Combining CheckHealth with Pre-Repair baseline to reduce log verbosity"
+        $Global:RepairResults.PreRepairHealth = Get-ComponentStoreHealth -DISMPath $DISMPath -Phase "Pre-Repair"
+        
+        # Use Pre-Repair health check result as Phase 1 CheckHealth result
+        $CheckHealthSuccess = -not $Global:RepairResults.PreRepairHealth.CorruptionDetected
+        $Global:RepairResults.DISMCheckHealthSuccess = $CheckHealthSuccess
+        $Global:RepairResults.CheckHealthDuration = "Combined with Pre-Repair Health Check"
+        
+        if ($CheckHealthSuccess) {
+            WriteLog "PHASE 1 Result: No component store corruption detected"
+        } else {
+            WriteLog "PHASE 1 Result: Potential corruption detected - proceeding to ScanHealth"
         }
-        $CheckHealthSuccess = Invoke-DISMCheckHealth -DISMPath $DISMPath
         
         # Phase 2: ScanHealth (if CheckHealth passed, run for thoroughness; if failed, mandatory)
-        if (-not (Test-DiskSpace -MinimumGB $MinimumDiskSpaceGB -Phase "Before ScanHealth")) {
+        if (-not (Test-DiskSpace -MinimumGB $MinimumDiskSpaceGB -Phase "Before ScanHealth" -Silent)) {
             throw "Insufficient disk space to proceed with DISM ScanHealth"
         }
         $ScanHealthSuccess = Invoke-DISMScanHealth -DISMPath $DISMPath
@@ -1437,8 +1825,8 @@ function Start-DISMRepair {
                 Start-WindowsUpdateServices | Out-Null
                 $RestoreHealthSuccess = Invoke-DISMRestoreHealth -DISMPath $DISMPath -SourcePath $DISMSource -LimitAccess:$LimitAccess
                 
-                # Check disk space after RestoreHealth to monitor consumption
-                Test-DiskSpace -MinimumGB 1 -Phase "After RestoreHealth" | Out-Null
+                # Check disk space after RestoreHealth to monitor consumption (silent mode)
+                Test-DiskSpace -MinimumGB 1 -Phase "After RestoreHealth" -Silent | Out-Null
             }
             
             if (-not $RestoreHealthSuccess) {
@@ -1481,8 +1869,8 @@ function Start-DISMRepair {
                 WriteLog "ERROR: SFC executable not found - skipping Phase 4"
                 $ExitCode = 2  # Partial success
             } else {
-                # Check disk space before SFC scan
-                if (-not (Test-DiskSpace -MinimumGB 1 -Phase "Before SFC Scan")) {
+                # Check disk space before SFC scan (silent unless issues)
+                if (-not (Test-DiskSpace -MinimumGB 1 -Phase "Before SFC Scan" -Silent)) {
                     WriteLog "WARNING: Low disk space before SFC scan"
                 }
                 
@@ -1499,6 +1887,19 @@ function Start-DISMRepair {
                 Get-CBSLogDetails | Out-Null
             }
         }
+        
+        # FEATURE 6: Capture POST-REPAIR component store health state
+        # Compare against pre-repair baseline to prove improvement
+        # Using Quiet mode to reduce log verbosity - details shown in comparison
+        WriteLog ""
+        WriteLog "=========================================="
+        WriteLog "FEATURE: Post-Repair Health Validation"
+        WriteLog "=========================================="
+        $Global:RepairResults.PostRepairHealth = Get-ComponentStoreHealth -DISMPath $DISMPath -Phase "Post-Repair" -Quiet
+        WriteLog "Post-Repair Health: $($Global:RepairResults.PostRepairHealth.HealthState) (Exit Code: $($Global:RepairResults.PostRepairHealth.ExitCode))"
+        
+        # Compare Pre/Post health states to measure repair effectiveness
+        Compare-HealthStates -PreHealth $Global:RepairResults.PreRepairHealth -PostHealth $Global:RepairResults.PostRepairHealth | Out-Null
         
         # Calculate total duration and final disk space
         $ScriptEndTime = Get-Date
@@ -1592,6 +1993,28 @@ function Start-DISMRepair {
             WriteLog "  Log Parsed: NO (CBS.log not accessible or no operations performed)"
         }
         WriteLog ""
+        WriteLog "PRE/POST REPAIR HEALTH COMPARISON:"
+        WriteLog "---------------------------------------------"
+        if ($Global:RepairResults.PreRepairHealth -and $Global:RepairResults.PostRepairHealth) {
+            WriteLog "  Pre-Repair State: $($Global:RepairResults.PreRepairHealth.HealthState)"
+            WriteLog "  Pre-Repair Timestamp: $($Global:RepairResults.PreRepairHealth.Timestamp)"
+            WriteLog "  Pre-Repair Corruption: $($Global:RepairResults.PreRepairHealth.CorruptionDetected)"
+            WriteLog ""
+            WriteLog "  Post-Repair State: $($Global:RepairResults.PostRepairHealth.HealthState)"
+            WriteLog "  Post-Repair Timestamp: $($Global:RepairResults.PostRepairHealth.Timestamp)"
+            WriteLog "  Post-Repair Corruption: $($Global:RepairResults.PostRepairHealth.CorruptionDetected)"
+            WriteLog ""
+            if ($Global:RepairResults.HealthImproved) {
+                WriteLog "  ✓ OUTCOME: HEALTH IMPROVED - Repairs were SUCCESSFUL"
+            } elseif ($Global:RepairResults.PreRepairHealth.CorruptionDetected -eq $false) {
+                WriteLog "  ✓ OUTCOME: HEALTH MAINTAINED - System was already healthy"
+            } else {
+                WriteLog "  ✗ OUTCOME: HEALTH UNCHANGED - Manual intervention may be required"
+            }
+        } else {
+            WriteLog "  Health Comparison: NOT AVAILABLE (Feature not executed)"
+        }
+        WriteLog ""
         
         # Display reboot requirement warning if applicable
         if ($Global:RepairResults.RebootRequired) {
@@ -1644,6 +2067,9 @@ function Start-DISMRepair {
         }
         
         WriteLog "#####################DISM + SFC Repair Process Ended#####################"
+        
+        # Cleanup temporary files before exit
+        Clear-TempFiles -Silent
     }
     catch {
         WriteLog ""
@@ -1655,6 +2081,19 @@ function Start-DISMRepair {
         $TotalDuration = $ScriptEndTime - $ScriptStartTime
         WriteLog "Process terminated after: $(Format-Duration $TotalDuration)"
         WriteLog "#####################DISM + SFC Repair Process Failed#####################"
+        
+        # Cleanup temporary files even on error
+        Clear-TempFiles -Silent
+    }
+    finally {
+        # CRITICAL: Always cleanup temp files, even if script is interrupted
+        # This ensures no orphaned temp files remain regardless of how script exits
+        try {
+            Clear-TempFiles -Silent
+        }
+        catch {
+            # Silent failure - don't block script exit
+        }
     }
     
     return $ExitCode
@@ -1696,6 +2135,72 @@ catch {
     WriteLog "Script execution failed: $($_.Exception.Message)"
     if ($Host.Name -eq "ConsoleHost") {
         exit 1
+    }
+}
+finally {
+    # Check if script was interrupted (Ctrl+C or abnormal termination)
+    # This block ALWAYS runs, even on Ctrl+C
+    if (-not $FinalExitCode -and $LogFile) {
+        # Script didn't complete normally - log manual intervention
+        $Timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+        $EmergencyLogFile = "$env:TEMP\dism_repair_emergency_cleanup.log"
+        
+        $ManualStopMessage = @"
+
+========================================
+SCRIPT EXECUTION INTERRUPTED
+========================================
+Timestamp: $Timestamp
+Reason: Manual intervention detected (User pressed Ctrl+C or terminated process)
+Status: Script execution was stopped before completion
+========================================
+
+"@
+        
+        try {
+            # Write to main log file
+            Add-Content -Path $LogFile -Value $ManualStopMessage -ErrorAction Stop
+            "$Timestamp Script execution stopped by user - logged to main log file" | Out-File -FilePath $EmergencyLogFile -Append
+            
+            # Cleanup temp files
+            $TempFiles = @(
+                "$env:TEMP\dism_checkhealth_output.txt",
+                "$env:TEMP\dism_checkhealth_error.txt",
+                "$env:TEMP\dism_scanhealth_output.txt",
+                "$env:TEMP\dism_scanhealth_error.txt",
+                "$env:TEMP\dism_restorehealth_output.txt",
+                "$env:TEMP\dism_restorehealth_error.txt",
+                "$env:TEMP\dism_health_check_Pre-Repair.txt",
+                "$env:TEMP\dism_health_check_Post-Repair.txt"
+            )
+            
+            $FilesCleanedCount = 0
+            "$Timestamp Emergency cleanup triggered (script termination detected)" | Out-File -FilePath $EmergencyLogFile -Append
+            
+            foreach ($TempFile in $TempFiles) {
+                if (Test-Path $TempFile -ErrorAction SilentlyContinue) {
+                    try {
+                        Remove-Item $TempFile -Force -ErrorAction Stop
+                        "$Timestamp Cleaned up: $TempFile" | Out-File -FilePath $EmergencyLogFile -Append
+                        $FilesCleanedCount++
+                    }
+                    catch {
+                        "$Timestamp WARNING: Could not remove $TempFile - $($_.Exception.Message)" | Out-File -FilePath $EmergencyLogFile -Append
+                    }
+                }
+            }
+            
+            "$Timestamp Emergency cleanup completed - $FilesCleanedCount temp files removed" | Out-File -FilePath $EmergencyLogFile -Append
+            
+            # Final message to main log
+            Add-Content -Path $LogFile -Value "$Timestamp #####################SCRIPT TERMINATED BY USER#####################" -ErrorAction Stop
+            Add-Content -Path $LogFile -Value "$Timestamp Emergency cleanup completed: $FilesCleanedCount temp files removed" -ErrorAction Stop
+            Add-Content -Path $LogFile -Value "$Timestamp Exit Code: INTERRUPTED (Manual termination)" -ErrorAction Stop
+        }
+        catch {
+            # Silent failure - don't block termination
+            "$Timestamp ERROR: Emergency cleanup logging failed - $($_.Exception.Message)" | Out-File -FilePath $EmergencyLogFile -Append -ErrorAction SilentlyContinue
+        }
     }
 }
 #endregion
