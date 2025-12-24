@@ -390,3 +390,320 @@ Status: Script execution was stopped before completion
 2025-12-24 14:45:07 #####################SCRIPT TERMINATED BY USER#####################
 2025-12-24 14:45:07 Emergency cleanup completed: 0 temp files removed
 2025-12-24 14:45:07 Exit Code: INTERRUPTED (Manual termination)
+2025-12-24 15:38:15 ------------------------------------------------------------------------------------
+2025-12-24 15:38:15 #####################Starting DISM + SFC System Repair Process#####################
+2025-12-24 15:38:15 ------------------------------------------------------------------------------------
+2025-12-24 15:38:15 Log file created at: C:\Users\v1\Desktop\testgit-1\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt
+2025-12-24 15:38:15 Microsoft Official Procedure: DISM (Component Store) ? SFC (System Files)
+2025-12-24 15:38:15 
+2025-12-24 15:38:15 === Script Parameters (Optional - Auto-defaults if not specified) ===
+2025-12-24 15:38:15 DISM Source: Windows Update (Default)
+2025-12-24 15:38:15 Limit Access (Offline Mode): False
+2025-12-24 15:38:15 Skip SFC Phase: False
+2025-12-24 15:38:15 Minimum Disk Space Required: 2 GB
+2025-12-24 15:38:15 Ignore Pending Reboot: False
+2025-12-24 15:38:15 Execution Mode: Fully Autonomous (Default)
+2025-12-24 15:38:15 =======================================================================
+2025-12-24 15:38:15 
+2025-12-24 15:38:15 ==========================================
+2025-12-24 15:38:15 Starting DISM + SFC System Repair Process
+2025-12-24 15:38:15 ==========================================
+2025-12-24 15:38:15 Process Start Time: 2025-12-24 15:38:15
+2025-12-24 15:38:15 Termination handler registered for emergency cleanup
+2025-12-24 15:38:15 Manual interruption (Ctrl+C) will be logged and cleanup will run automatically
+2025-12-24 15:38:15 === Validating System Requirements ===
+2025-12-24 15:38:15 Operating System: Microsoft Windows 11 Pro (Build 26200)
+2025-12-24 15:38:15 System Architecture: 64-bit
+2025-12-24 15:38:15 Administrator privileges: Confirmed
+2025-12-24 15:38:15 PowerShell Version: 5.1
+2025-12-24 15:38:15 System Drive: C:
+2025-12-24 15:38:15 Available Disk Space: 30.47 GB
+2025-12-24 15:38:15 System requirements validation: PASSED
+2025-12-24 15:38:15 
+2025-12-24 15:38:15 === Checking for Pending System Reboot ===
+2025-12-24 15:38:15 Result: No pending reboot detected
+2025-12-24 15:38:15 Status: System is in clean state for repair operations
+2025-12-24 15:38:15 
+2025-12-24 15:38:15 SAFETY: Creating system restore point before repair operations...
+2025-12-24 15:38:15 
+2025-12-24 15:38:15 === Creating System Restore Point ===
+2025-12-24 15:38:15 Restore Point Description: Before DISM/SFC Repair - 2025-12-24 15:38
+2025-12-24 15:38:15 Location: C:\System Volume Information\ (Windows VSS)
+2025-12-24 15:38:15 Creating restore point... (This may take 1-2 minutes)
+2025-12-24 15:38:17 WARNING: Failed to create restore point - This command cannot be run due to the following error: the service cannot be started because it is disabled or does not have enabled devices associated with it.
+2025-12-24 15:38:17 Impact: No automated rollback available if repair causes issues
+2025-12-24 15:38:17 Recommendation: Create manual backup or restore point before proceeding
+2025-12-24 15:38:17 Status: Continuing anyway (operations will proceed without restore point)
+2025-12-24 15:38:17 
+2025-12-24 15:38:17 DISM Executable Location: C:\WINDOWS\System32\dism.exe
+2025-12-24 15:38:17 
+2025-12-24 15:38:17 ==========================================
+2025-12-24 15:38:17 PHASE 1 + Pre-Repair Health Baseline
+2025-12-24 15:38:17 ==========================================
+2025-12-24 15:38:17 Note: Combining CheckHealth with Pre-Repair baseline to reduce log verbosity
+2025-12-24 15:38:17 
+2025-12-24 15:38:17 === Capturing Component Store Health (Pre-Repair) ===
+2025-12-24 15:38:17 Executing: DISM.exe /Online /Cleanup-Image /CheckHealth
+2025-12-24 15:38:17 Purpose: Capture current component store health state
+2025-12-24 15:38:19 Result: Component store is HEALTHY (No corruption detected)
+2025-12-24 15:38:19 Health State: Healthy
+2025-12-24 15:38:19 Corruption Detected: False
+2025-12-24 15:38:19 Exit Code: 0
+2025-12-24 15:38:19 PHASE 1 Result: No component store corruption detected
+2025-12-24 15:38:19 
+2025-12-24 15:38:19 ==========================================
+2025-12-24 15:38:19 PHASE 2: DISM ScanHealth Deep Scan
+2025-12-24 15:38:19 ==========================================
+2025-12-24 15:38:19 Description: Thorough scan to check for component store corruption
+2025-12-24 15:38:19 Expected Duration: 5-15 minutes
+2025-12-24 15:38:19 Starting DISM ScanHealth at: 2025-12-24 15:38:19
+2025-12-24 15:38:19 NOTE: This operation may take several minutes. Please wait...
+2025-12-24 15:38:19 Executing: DISM.exe /Online /Cleanup-Image /ScanHealth
+2025-12-24 15:41:49 WARNING: Failed to remove C:\Users\v1\AppData\Local\Temp\dism_scanhealth_output.txt - The process cannot access the file 'C:\Users\v1\AppData\Local\Temp\dism_scanhealth_output.txt' because it is being used by another process.
+2025-12-24 15:41:49 WARNING: Failed to remove C:\Users\v1\AppData\Local\Temp\dism_scanhealth_error.txt - The process cannot access the file 'C:\Users\v1\AppData\Local\Temp\dism_scanhealth_error.txt' because it is being used by another process.
+
+========================================
+SCRIPT EXECUTION INTERRUPTED
+========================================
+Timestamp: 2025-12-24 15:41:49
+Reason: Manual intervention detected (User pressed Ctrl+C or terminated process)
+Status: Script execution was stopped before completion
+========================================
+
+2025-12-24 15:41:49 #####################SCRIPT TERMINATED BY USER#####################
+2025-12-24 15:41:49 Emergency cleanup completed: 0 temp files removed
+2025-12-24 15:41:49 Exit Code: INTERRUPTED (Manual termination)
+2025-12-24 15:47:36 ------------------------------------------------------------------------------------
+2025-12-24 15:47:36 #####################Starting DISM + SFC System Repair Process#####################
+2025-12-24 15:47:36 ------------------------------------------------------------------------------------
+2025-12-24 15:47:36 Log file created at: C:\Users\v1\Desktop\testgit-1\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt
+2025-12-24 15:47:36 Microsoft Official Procedure: DISM (Component Store) ? SFC (System Files)
+2025-12-24 15:47:36 
+2025-12-24 15:47:36 === Script Parameters (Optional - Auto-defaults if not specified) ===
+2025-12-24 15:47:36 DISM Source: Windows Update (Default)
+2025-12-24 15:47:36 Limit Access (Offline Mode): False
+2025-12-24 15:47:36 Skip SFC Phase: False
+2025-12-24 15:47:36 Minimum Disk Space Required: 2 GB
+2025-12-24 15:47:36 Ignore Pending Reboot: False
+2025-12-24 15:47:36 Execution Mode: Fully Autonomous (Default)
+2025-12-24 15:47:36 =======================================================================
+2025-12-24 15:47:36 
+2025-12-24 15:47:36 ==========================================
+2025-12-24 15:47:36 Starting DISM + SFC System Repair Process
+2025-12-24 15:47:36 ==========================================
+2025-12-24 15:47:36 Process Start Time: 2025-12-24 15:47:36
+2025-12-24 15:47:36 Termination handler registered for emergency cleanup
+2025-12-24 15:47:36 Manual interruption (Ctrl+C) will be logged and cleanup will run automatically
+2025-12-24 15:47:36 === Validating System Requirements ===
+2025-12-24 15:47:37 Operating System: Microsoft Windows 11 Pro (Build 26200)
+2025-12-24 15:47:37 System Architecture: 64-bit
+2025-12-24 15:47:37 Administrator privileges: Confirmed
+2025-12-24 15:47:37 PowerShell Version: 5.1
+2025-12-24 15:47:37 System Drive: C:
+2025-12-24 15:47:37 Available Disk Space: 30.36 GB
+2025-12-24 15:47:37 System requirements validation: PASSED
+2025-12-24 15:47:37 
+2025-12-24 15:47:37 === Checking for Pending System Reboot ===
+2025-12-24 15:47:37 Result: No pending reboot detected
+2025-12-24 15:47:37 Status: System is in clean state for repair operations
+2025-12-24 15:47:37 
+2025-12-24 15:47:37 SAFETY: Creating system restore point before repair operations...
+2025-12-24 15:47:37 
+2025-12-24 15:47:37 === Creating System Restore Point ===
+2025-12-24 15:47:37 Restore Point Description: Before DISM/SFC Repair - 2025-12-24 15:47
+2025-12-24 15:47:37 Location: C:\System Volume Information\ (Windows VSS)
+2025-12-24 15:47:37 Creating restore point... (This may take 1-2 minutes)
+2025-12-24 15:47:39 WARNING: Failed to create restore point - This command cannot be run due to the following error: the service cannot be started because it is disabled or does not have enabled devices associated with it.
+2025-12-24 15:47:39 Impact: No automated rollback available if repair causes issues
+2025-12-24 15:47:39 Recommendation: Create manual backup or restore point before proceeding
+2025-12-24 15:47:39 Status: Continuing anyway (operations will proceed without restore point)
+2025-12-24 15:47:39 
+2025-12-24 15:47:39 DISM Executable Location: C:\WINDOWS\System32\dism.exe
+2025-12-24 15:47:39 
+2025-12-24 15:47:39 ==========================================
+2025-12-24 15:47:39 PHASE 1 + Pre-Repair Health Baseline
+2025-12-24 15:47:39 ==========================================
+2025-12-24 15:47:39 Note: Combining CheckHealth with Pre-Repair baseline to reduce log verbosity
+2025-12-24 15:47:39 
+2025-12-24 15:47:39 === Capturing Component Store Health (Pre-Repair) ===
+2025-12-24 15:47:39 Executing: DISM.exe /Online /Cleanup-Image /CheckHealth
+2025-12-24 15:47:39 Purpose: Capture current component store health state
+2025-12-24 15:47:41 Result: Component store is HEALTHY (No corruption detected)
+2025-12-24 15:47:41 Health State: Healthy
+2025-12-24 15:47:41 Corruption Detected: False
+2025-12-24 15:47:41 Exit Code: 0
+2025-12-24 15:47:41 PHASE 1 Result: No component store corruption detected
+2025-12-24 15:47:41 
+2025-12-24 15:47:42 ==========================================
+2025-12-24 15:47:42 PHASE 2: DISM ScanHealth Deep Scan
+2025-12-24 15:47:42 ==========================================
+2025-12-24 15:47:42 Description: Thorough scan to check for component store corruption
+2025-12-24 15:47:42 Expected Duration: 5-15 minutes
+2025-12-24 15:47:42 Starting DISM ScanHealth at: 2025-12-24 15:47:42
+2025-12-24 15:47:42 NOTE: This operation may take several minutes. Please wait...
+2025-12-24 15:47:42 Executing: DISM.exe /Online /Cleanup-Image /ScanHealth
+2025-12-24 15:52:57 DISM ScanHealth completed at: 2025-12-24 15:52:57
+2025-12-24 15:52:57 Duration: 5 minutes 15 seconds
+2025-12-24 15:52:57 Exit Code: 0
+2025-12-24 15:52:57 Result: No corruption found in component store
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 No corruption detected - RestoreHealth repair not required
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 Proceeding to Phase 4: SFC scan (Tier 2 System32 file repair)
+2025-12-24 15:52:57 Microsoft Guidance: Always run SFC after DISM for complete repair coverage
+2025-12-24 15:52:57 SFC Executable Location: C:\WINDOWS\System32\sfc.exe
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 ==========================================
+2025-12-24 15:52:57 PHASE 4: System File Checker (SFC) Scan
+2025-12-24 15:52:57 ==========================================
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 WHAT: Scanning and repairing corrupted system files in System32
+2025-12-24 15:52:57 WHY: SFC fixes Tier 2 active DLL files used by Windows Update components
+2025-12-24 15:52:57 HOW: Validates files against WinSxS component store (repaired by DISM)
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 Starting SFC /scannow at: 2025-12-24 15:52:57
+2025-12-24 15:52:57 Expected Duration: 10-60 minutes depending on system state
+2025-12-24 15:52:57 
+2025-12-24 15:52:57 Executing: C:\WINDOWS\System32\sfc.exe /scannow
+2025-12-24 15:52:57 Please wait - SFC is scanning protected system files...
+2025-12-24 15:58:01 
+2025-12-24 15:58:01 SFC scan completed at: 2025-12-24 15:58:01
+2025-12-24 15:58:01 Duration: 5 minutes 4 seconds
+2025-12-24 15:58:01 
+2025-12-24 15:58:01 SFC Exit Code: 0
+2025-12-24 15:58:01 RESULT: No integrity violations detected
+2025-12-24 15:58:01 STATUS: System files are healthy - no repair needed
+2025-12-24 15:58:01 
+2025-12-24 15:58:01 POST-ANALYSIS: Extracting detailed results from CBS.log...
+2025-12-24 15:58:01 
+2025-12-24 15:58:01 === Parsing CBS.log for Detailed Results ===
+2025-12-24 15:58:01 CBS.log Location: C:\WINDOWS\Logs\CBS\CBS.log
+2025-12-24 15:58:01 CBS.log Size: 15.51 MB
+2025-12-24 15:58:01 Parsing log file (last 5000 lines for recent operations)...
+2025-12-24 15:58:02 Lines read: 5000
+2025-12-24 15:58:02 
+2025-12-24 15:58:02 CBS.log Parsing Results:
+2025-12-24 15:58:02 -------------------------
+2025-12-24 15:58:02 Corrupted Files Found: 0
+2025-12-24 15:58:02 
+2025-12-24 15:58:02 Repair Actions Detected: 40
+2025-12-24 15:58:02 
+2025-12-24 15:58:02 Recent Repair Activities:
+2025-12-24 15:58:02   - 2025-12-24 15:52:08, Info                  CSI    0000001e Warning: Unable to repair payload file ([l:19]'DeploymentAgen
+2025-12-24 15:58:02   - 2025-12-24 15:52:08, Info                  CSI    0000001f Warning: Unable to repair payload file ([l:11]'marshal.dll') 
+2025-12-24 15:58:02   - 2025-12-24 15:52:08, Info                  CSI    00000020 Warning: Unable to repair payload file ([l:38]'Microsoft.UI.C
+2025-12-24 15:58:02   - 2025-12-24 15:52:08, Info                  CSI    00000021 Warning: Unable to repair payload file ([l:26]'Microsoft.UI.W
+2025-12-24 15:58:02   - 2025-12-24 15:52:09, Info                  CSI    00000022 Warning: Unable to repair payload file ([l:48]'Microsoft.Wind
+2025-12-24 15:58:02 
+2025-12-24 15:58:02 Full CBS.log available at: C:\WINDOWS\Logs\CBS\CBS.log
+2025-12-24 15:58:02 Use: Get-Content 'C:\WINDOWS\Logs\CBS\CBS.log' | Select-String 'corruption|repair' for details
+2025-12-24 15:58:02 
+2025-12-24 15:58:02 ==========================================
+2025-12-24 15:58:02 FEATURE: Post-Repair Health Validation
+2025-12-24 15:58:02 ==========================================
+2025-12-24 15:58:03 Post-Repair Health: Healthy (Exit Code: 0)
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 ==========================================
+2025-12-24 15:58:03 PRE/POST REPAIR HEALTH COMPARISON
+2025-12-24 15:58:03 ==========================================
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 BEFORE REPAIR (Pre-Repair State):
+2025-12-24 15:58:03   Timestamp: 2025-12-24 15:47:39
+2025-12-24 15:58:03   Health State: Healthy
+2025-12-24 15:58:03   Corruption Detected: False
+2025-12-24 15:58:03   Exit Code: 0
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 AFTER REPAIR (Post-Repair State):
+2025-12-24 15:58:03   Timestamp: 2025-12-24 15:58:02
+2025-12-24 15:58:03   Health State: Healthy
+2025-12-24 15:58:03   Corruption Detected: False
+2025-12-24 15:58:03   Exit Code: 0
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 OUTCOME: ? HEALTH MAINTAINED - No corruption before or after
+2025-12-24 15:58:03   Before: Healthy (Healthy)
+2025-12-24 15:58:03   After: Healthy (Healthy)
+2025-12-24 15:58:03   Verdict: System was already healthy (preventive maintenance)
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 ==========================================
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 ==========================================
+2025-12-24 15:58:03 DISM + SFC Repair Process Completed
+2025-12-24 15:58:03 ==========================================
+2025-12-24 15:58:03 Process End Time: 2025-12-24 15:58:03
+2025-12-24 15:58:03 Total Duration: 10 minutes 26 seconds
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 === DETAILED SUMMARY REPORT ===
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 TIER 1: DISM Component Store Repair (WinSxS)
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 PHASE 1 - CheckHealth:
+2025-12-24 15:58:03   Status: SUCCESS
+2025-12-24 15:58:03   Duration: Combined with Pre-Repair Health Check
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 PHASE 2 - ScanHealth:
+2025-12-24 15:58:03   Status: SUCCESS
+2025-12-24 15:58:03   Duration: 5 minutes 15 seconds
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 PHASE 3 - RestoreHealth:
+2025-12-24 15:58:03   Status: SUCCESS
+2025-12-24 15:58:03   Duration: Not Required (No Corruption)
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 TIER 2: SFC System File Repair (System32)
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 PHASE 4 - SFC /scannow:
+2025-12-24 15:58:03   Status: SUCCESS
+2025-12-24 15:58:03   Corruption Found: NO
+2025-12-24 15:58:03   Corruption Fixed: N/A
+2025-12-24 15:58:03   Duration: 5 minutes 4 seconds
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 TOTAL EXECUTION TIME: 10 minutes 26 seconds
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 DISK SPACE ANALYSIS:
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03   Initial Free Space: 30.36 GB
+2025-12-24 15:58:03   Final Free Space: 30.26 GB
+2025-12-24 15:58:03   Space Consumed: 0.1 GB
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 SYSTEM RESTORE POINT:
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03   Status: NOT CREATED (System Restore disabled or recent restore point exists)
+2025-12-24 15:58:03   Impact: Manual backup recommended for rollback capability
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 CBS.LOG ANALYSIS:
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03   Log Parsed: YES
+2025-12-24 15:58:03   Corrupted Files Identified: 0
+2025-12-24 15:58:03   Repair Actions Logged: 40
+2025-12-24 15:58:03   Full Log: C:\Windows\Logs\CBS\CBS.log
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 PRE/POST REPAIR HEALTH COMPARISON:
+2025-12-24 15:58:03 ---------------------------------------------
+2025-12-24 15:58:03   Pre-Repair State: Healthy
+2025-12-24 15:58:03   Pre-Repair Timestamp: 2025-12-24 15:47:39
+2025-12-24 15:58:03   Pre-Repair Corruption: False
+2025-12-24 15:58:03 
+2025-12-24 15:58:03   Post-Repair State: Healthy
+2025-12-24 15:58:03   Post-Repair Timestamp: 2025-12-24 15:58:02
+2025-12-24 15:58:03   Post-Repair Corruption: False
+2025-12-24 15:58:03 
+2025-12-24 15:58:03   ? OUTCOME: HEALTH MAINTAINED - System was already healthy
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 FINAL RESULT: All repair operations completed successfully
+2025-12-24 15:58:03 SYSTEM STATUS: Component Store and System Files are healthy
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 Log file saved: C:\Users\v1\Desktop\testgit-1\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failureLog.txt
+2025-12-24 15:58:03 CBS.log location: C:\\Windows\\Logs\\CBS\\CBS.log (for detailed SFC results)
+2025-12-24 15:58:03 DISM.log location: C:\\Windows\\Logs\\DISM\\dism.log (for detailed DISM results)
+2025-12-24 15:58:03 
+2025-12-24 15:58:03 === Exporting Results to JSON ===
+2025-12-24 15:58:04 JSON export successful: C:\Users\v1\Desktop\testgit-1\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure-Results.json
+2025-12-24 15:58:04 File size: 92.01 KB
+2025-12-24 15:58:04 JSON results exported: C:\Users\v1\Desktop\testgit-1\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure\19156_Win_Update_Repair_Windows_Update_Standalone_Installer_failure-Results.json
+2025-12-24 15:58:04 #####################DISM + SFC Repair Process Ended#####################
+2025-12-24 15:58:04 JSON file updated with exit code: True True 0
+2025-12-24 15:58:04 
+2025-12-24 15:58:04 Script execution completed with exit code: True True 0
+2025-12-24 15:58:04 Exit Code Legend: 0=Success, 1=Failure, 2=Partial Success, 3=Administrator Required
