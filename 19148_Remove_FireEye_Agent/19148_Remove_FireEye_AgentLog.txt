@@ -33,3 +33,21 @@
 2025-11-21 14:58:38 - [INFO] - Uninstall required: No
 2025-11-21 14:58:38 - [INFO] - Verification passed: True
 2025-11-21 14:58:38 - [SUCCESS] - === FireEye Agent Not Present - Script Completed ===
+2025-12-26 12:47:18 - [INFO] - === FireEye Agent Removal Script Started ===
+2025-12-26 12:47:18 - [INFO] - Script Version: 2.0
+2025-12-26 12:47:18 - [INFO] - Timeout configured: 300 seconds
+2025-12-26 12:47:18 - [INFO] - Max retries configured: 3
+2025-12-26 12:47:18 - [INFO] - ========== STEP 1: PRE-REMOVAL VALIDATION ==========
+2025-12-26 12:47:18 - [INFO] - Performing pre-removal validation using registry scan...
+2025-12-26 12:47:19 - [INFO] - Pre-validation: No FireEye/Mandiant products detected in registry
+2025-12-26 12:47:19 - [INFO] - No FireEye/Mandiant Agent found on this machine. Nothing to remove.
+2025-12-26 12:47:19 - [INFO] - ========== STEP 2: VERIFICATION ==========
+2025-12-26 12:47:19 - [INFO] - Performing post-removal verification...
+2025-12-26 12:47:21 - [SUCCESS] - Verification CHECK 1: No FireEye/Mandiant products in registry
+2025-12-26 12:47:21 - [SUCCESS] - Verification CHECK 2: No FireEye/Mandiant services found
+2025-12-26 12:47:21 - [SUCCESS] - Verification CHECK 3: No FireEye/Mandiant directories found
+2025-12-26 12:47:21 - [SUCCESS] - === POST-REMOVAL VERIFICATION PASSED ===
+2025-12-26 12:47:21 - [INFO] - === EXECUTION SUMMARY ===
+2025-12-26 12:47:21 - [INFO] - Uninstall required: No
+2025-12-26 12:47:21 - [INFO] - Verification passed: True
+2025-12-26 12:47:21 - [SUCCESS] - === FireEye Agent Not Present - Script Completed ===
