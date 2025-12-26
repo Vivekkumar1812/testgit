@@ -1,0 +1,65 @@
+Here’s a concise, section-wise summary of your report:
+________________________________________
+Verdict
+•	Likelihood of success: 
+o	Moderate in unmanaged environments where FireEye is MSI-registered and not tamper-protected.
+o	Low in enterprise environments with EDR protection, uninstall passphrases, or non-MSI installs.
+•	Key caveat: Relies on Win32_Product and CIM uninstall—slow, intrusive, and unreliable; FireEye often needs vendor uninstall switches or passwords.
+________________________________________
+Pros
+•	Enforces admin elevation before proceeding.
+•	Multi-method removal: msiexec /x then CIM uninstall fallback.
+•	Includes timeouts to prevent hangs.
+•	Exit codes differentiate success (0), partial (2), failure (1).
+•	Post-verification checks for products, services (FireEye, xagt), and directories.
+________________________________________
+Cons
+•	Win32_Product is slow, triggers MSI self-repair, and misses non-MSI installs.
+•	Vendor uninstall requirements (passphrase/tamper protection) not handled.
+•	Narrow detection: only matches “FireEye”; misses branding changes (e.g., Mandiant).
+•	Doesn’t stop services before uninstall; increases reboot/failure risk.
+•	Log filename quirk: appends .ps1 incorrectly.
+•	No residual cleanup for failed verification.
+________________________________________
+Failure Points
+•	Tamper protection blocks uninstall (MSI 1603).
+•	Non-MSI installs not detected.
+•	MSI busy (1618) → script fails without retry.
+•	Timeout aborts jobs mid-process.
+•	Residual directories/services remain after uninstall.
+•	WMI/CIM failures cause false negatives.
+________________________________________
+Testing Scenarios
+•	MSI agent (lab): Expect success (0 or 3010), no residuals.
+•	Non-MSI agent: Detection fails; services persist; exit 2 or 1.
+•	Tamper-protected: Uninstall blocked; exit 1.
+•	Busy installer: MSI 1618; script logs failure.
+•	Branding variance: Detection misses; verification catches services.
+________________________________________
+Metrics
+•	Detection count and GUIDs.
+•	Removal success/failure per method.
+•	Verification of services/directories.
+•	Error types and counts.
+•	Timing for uninstall and overall runtime.
+________________________________________
+Acceptance Criteria
+•	Admin check enforced (exit 1 if non-admin).
+•	Robust detection without triggering MSI repairs.
+•	Reliable uninstall using vendor-supported methods.
+•	Verification ensures no residual products/services.
+•	Exit codes: 0 success, 2 partial, 1 failure.
+________________________________________
+Recommendations
+•	Avoid Win32_Product: Use registry keys under HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* and WOW6432Node.
+•	Support vendor uninstall: Handle passphrase via xagt.exe -uninstall <password> or vendor tool.
+•	Stop services pre-uninstall: Disable/start prevention to reduce reboot need.
+•	Handle MSI codes: Retry/backoff for 1618; flag 3010 for reboot.
+•	Expand detection: Include “Mandiant”, service names, common dirs.
+•	Residual cleanup: Remove leftover services and directories.
+•	Fix log filename: Strip .ps1 before appending.
+•	WMI health checks: Fall back to registry if CIM fails.
+________________________________________
+Final Assessment
+Good structure (logging, multi-method removal, verification), but success depends on MSI registration and no tamper protection. Replace Win32_Product with registry-based detection, add vendor uninstall support, and pre-stop services for reliability. After these changes, success likelihood becomes high for enterprise conditions.
+
